@@ -36,7 +36,6 @@ font-size: 20px;
 スタンプ表示エリア
 ***************************/
 
-
 .container {
     display: flex;
     flex-wrap: wrap;
@@ -57,6 +56,17 @@ height: 100px; /* 画像の適切な高さを設定 */
 .point {
 font-size: 16px; /* ポイントのフォントサイズを設定 */
 }
+
+/* 透明度を指定するためのクラス */
+.clicked-image {
+    opacity: 0.5; /* 透明度の値を調整 */
+  }
+  
+
+/* 透明度が変わるアニメーション */
+/* .clicked-image {
+transition: opacity 0.3s ease; /* 変化にかかる時間とイージング関数を調整できます */
+
 
 /************************** 
 登録スタンプ更新エリア
