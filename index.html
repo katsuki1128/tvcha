@@ -31,11 +31,11 @@
   </head>
 
   <body>
+
     <!----------------------------------------------
     ⭐️ここが大元！スタンプ生成ブロック  
     ------------------------------------------------->
     <!-- ⭐️スタンプ表示エリア -->
-    <div id="stampListContainer" class="container"></div>
     <section class="bg-gray-200">
       <div
         class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto"
@@ -46,10 +46,7 @@
           <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
             <div>
               <img
-                class="w-40 h-15 mr-2"
-                src="./img/tvcha_logo.png"
-                alt="logo"
-              />
+                class="w-40 h-15 mr-2" src="./img/tvcha_logo.png" alt="logo"/>
             </div>
 
             <form>
@@ -280,20 +277,6 @@
       });
 
       //----------------------------------------
-      // ▼スタンプクリック関数
-      //----------------------------------------
-
-      function handleItemClick(documentId) {
-        // Firestoreのドキュメント参照を作成
-        const docRef = doc(db, "tvcha", documentId);
-
-        // データを更新する
-        updateDoc(docRef, {
-          count: increment(1),
-        });
-      }
-
-      //----------------------------------------
       // ▼変更ボタン関数
       //----------------------------------------
 
@@ -438,43 +421,6 @@
         $("#output").html(table);
 
         // console.log("countData", countData, "imageUrls", imageUrls);
-
-        //----------------------------------------
-        // ▼スタンプを表示する関数
-        //----------------------------------------
-
-        console.log("pointData", pointData);
-
-        const stampListContainer = document.getElementById('stampListContainer');
-
-        function renderImages() {
-          stampListContainer.innerHTML = '';          
-
-          imageUrls.forEach((imageUrl, index) => {
-            const imageWrapper = document.createElement('div');
-            imageWrapper.className = 'image-wrapper';
-            
-            const imageElement = document.createElement('img');
-            imageElement.src = imageUrl;
-            imageElement.className = 'image';
-            
-            // スタンプをクリックしたときにhandleStampClick関数を呼び出す
-            imageElement.addEventListener('click', () => handleItemClick(array[index].id));
-
-            
-            imageWrapper.appendChild(imageElement);
-            
-            const pointElement = document.createElement('div');
-            pointElement.textContent = `${pointData[index]}`;
-            pointElement.className = 'point';
-            imageWrapper.appendChild(pointElement);
-            
-            stampListContainer.appendChild(imageWrapper);
-          });
-          
-        }
-
-        renderImages();
 
 
         //----------------------------------------

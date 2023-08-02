@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>スタンプ作成画面</title>
+
+    <!-- CSS & Tailwind -->
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="reset.css" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/flowbite@1.4.4/dist/flowbite.min.css"
+    />
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+  </head>
+
+  <body>
+    <!----------------------------------------------
+    ⭐️スタンプ表示エリア  
+    ------------------------------------------------->
+    <section class="bg-gray-200">
+      <div
+        class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto"
+      >
+        <div
+          class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0"
+        >
+          <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <div>
+              <a href="./index.html">
+              <img
+                class="w-40 h-15 mr-2"
+                src="./img/tvcha_logo.png"
+                alt="logo"
+              />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="stampListContainer" class="container"></div>
+    <!-- ⭐️スタンプ一覧表示エリア -->
+    <section class="bg-gray-200">
+      <div
+        class="flex flex-col items-center justify-center px-6 pt-4 pb-4 mx-auto"
+      >
+        
+
+      </div>
+    </section>
+
+    <script type="module">
+      //----------------------------------------
+      // ▼firebaseプロジェクトとjavaScriptを連携させる
+      //----------------------------------------
+
+      // 必要な機能をSDKからインポート
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+
+      // firebase firestoreとやり取りをする設定
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        serverTimestamp,
+        query,
+        orderBy, //データのソート
+        onSnapshot, // Firestore 上に保存されているデータを取得
+        doc,
+        deleteDoc,
+        updateDoc,
+        getDocs,
+        getDoc,
+        increment
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+      // firebase storageとやり取りをする設定
+      import {
+        getStorage,
+        ref,
+        uploadBytes,
+        getDownloadURL,
+      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+      // ウェブアプリのFirebaseの設定
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs-rcINsUSZe7bD7OeLTrNcXm6-OInABg",
+        authDomain: "tvcha-9cae7.firebaseapp.com",
+        projectId: "tvcha-9cae7",
+        storageBucket: "tvcha-9cae7.appspot.com",
+        messagingSenderId: "866848033597",
+        appId: "1:866848033597:web:c6887382eb14ee58351354",
+      };
+
+      // Firebaseの初期化
+      const app = initializeApp(firebaseConfig);
+
+      // FirebaseアプリとCloud Storageの連携を初期化しセットアップする
+      const storage = getStorage(app);
+
+      // dbに対してデータの追加や取得ができるようにする
+      const db = getFirestore(app);
+
+      // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+      const q = query(collection(db, "tvcha"), orderBy("order", "desc"));
+
+      //----------------------------------------
+      // ▼画像が選択された時のみ登録ボタンが有効になる
+      //----------------------------------------
+
+      
+
+      //----------------------------------------
+      // ▼スタンプクリック関数
+      //----------------------------------------
+
+      function handleItemClick(documentId) {
+        // Firestoreのドキュメント参照を作成
+        const docRef = doc(db, "tvcha", documentId);
+
+        // データを更新する
+        updateDoc(docRef, {
+          count: increment(1),
+        });
+      }
+
+      //----------------------------------------
+      // ▼変更ボタン関数
+      //----------------------------------------
+
+      // 画像のダウンロード URL を取得して表示するための関数
+      function displayImage(downloadURL, element) {
+        // すでに画像が表示されている場合は削除する
+        while (element.firstChild) {
+          element.removeChild(element.firstChild);
+        }
+
+        // 新しい画像を表示
+        const img = document.createElement("img");
+        img.src = downloadURL;
+        element.appendChild(img);
+      }
+
+      // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
+      onSnapshot(q, (querySnapshot) => {
+        const array = [];
+        querySnapshot.docs.forEach(function (doc) {
+          const document = {
+            id: doc.id,
+            data: doc.data(),
+          };
+          array.push(document);
+        });
+
+        const pointData = []; // pointDataを初期化しておく
+        const countData = []; // countDataを初期化しておく
+        const imageUrls = []; // imageUrlsを初期化しておく
+
+
+        //----------------------------------------
+        // id: 'ドキュメントのID',
+        // data: {
+        //      img: '画像のURL',
+        //      point: 'ポイント',
+        //      count: 'カウント',
+        //      time: '作成日時など'
+        // countData : 'カウントの配列',
+        // imageUrls : '画像のURLの配列'
+        //----------------------------------------
+
+        let tableRows = "";
+
+        array.forEach(function (document, index) {
+          const deleteButton = `<button class="delete-btn" data-id="${document.id}"><i class="fas fa-trash"></i></button>`;
+
+          // 奇数行と偶数行でスタイルを切り替える
+          const rowStyleClass = index % 2 === 0 ? "even-row" : "odd-row";
+
+          // indexが0の場合（1行目の場合）はincrementButtonを追加しない
+          const incrementButton =
+            index === 0
+              ? ""
+              : `<button class="increment-btn" data-id="${document.id}"><i class="fa-solid fa-arrow-up"></i></button>`;
+
+          // indexが最後の行でない場合のみdecrementButtonを追加
+          const decrementButton =
+            index !== array.length - 1
+              ? `<button class="decrement-btn" data-id="${document.id}"><i class="fa-solid fa-arrow-down"></i></button>`
+              : "";
+
+          
+          // countDataにdocument.data.countを追加
+          pointData.push(document.data.point);
+          
+          // countDataにdocument.data.countを追加
+          countData.push(document.data.count);
+
+          // imageUrlsにdocument.data.imgを追加
+          imageUrls.push(document.data.img);
+
+        //----------------------------------------
+        // ▼スタンプ更新テーブルを表示する関数
+        //----------------------------------------
+
+          // 画像のダウンロード URL を取得して表示
+          getDownloadURL(ref(storage, document.data.img)).then(
+            (downloadURL) => {
+              const imageElement = $(`#image-${index}`)[0];
+              displayImage(downloadURL, imageElement);
+            }
+          );
+        });
+
+        //----------------------------------------
+        // ▼スタンプを表示する関数
+        //----------------------------------------
+
+        console.log("pointData", pointData);
+
+        const stampListContainer = document.getElementById('stampListContainer');
+
+        function renderImages() {
+          stampListContainer.innerHTML = '';          
+
+          imageUrls.forEach((imageUrl, index) => {
+            const imageWrapper = document.createElement('div');
+            imageWrapper.className = 'image-wrapper';
+            
+            const imageElement = document.createElement('img');
+            imageElement.src = imageUrl;
+            imageElement.className = 'image';
+            
+            // スタンプをクリックしたときにhandleStampClick関数を呼び出す
+            imageElement.addEventListener('click', () => handleItemClick(array[index].id));
+
+            
+            imageWrapper.appendChild(imageElement);
+            
+            const pointElement = document.createElement('div');
+            pointElement.textContent = `${pointData[index]}`;
+            pointElement.className = 'point';
+            imageWrapper.appendChild(pointElement);
+            
+            stampListContainer.appendChild(imageWrapper);
+          });
+          
+        }
+
+        renderImages();
+
+      });
+
+    </script>
+  </body>
+</html>
