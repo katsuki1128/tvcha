@@ -47,17 +47,21 @@
       </div>
     </section>
 
+
+    <!-- ⭐️同時配信イメージ -->
+    <!-- <iframe src="tv_overlay.html" width="720" height="480"></iframe> -->
+
+
+
     <div id="stampListContainer" class="container"></div>
     <!-- ⭐️スタンプ一覧表示エリア -->
     <section class="bg-gray-200">
       <div
         class="flex flex-col items-center justify-center px-6 pt-4 pb-4 mx-auto"
       >
-        
-
       </div>
     </section>
-
+    <a href="./tv_overlay.html">→tv</a>
     <script type="module">
       //----------------------------------------
       // ▼firebaseプロジェクトとjavaScriptを連携させる
@@ -209,7 +213,7 @@
                 imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
                 setTimeout(() => {
                   imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
-                }, 1000); // 透明度が元に戻るまでの時間（ミリ秒）。0.3秒（300ミリ秒）で指定していますが、必要に応じて調整してください。
+                },2000); 
               });
               
               imageWrapper.appendChild(imageElement);
