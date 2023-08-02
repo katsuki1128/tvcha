@@ -203,7 +203,14 @@
               imageElement.className = 'image';
               
               // スタンプをクリックしたときにhandleStampClick関数を呼び出す
-              imageElement.addEventListener('click', () => handleItemClick(array[index].id));
+              // imageElement.addEventListener('click', () => handleItemClick(array[index].id));
+              imageElement.addEventListener('click', () => {
+                handleItemClick(array[index].id);
+                imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
+                setTimeout(() => {
+                  imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
+                }, 1000); // 透明度が元に戻るまでの時間（ミリ秒）。0.3秒（300ミリ秒）で指定していますが、必要に応じて調整してください。
+              });
               
               imageWrapper.appendChild(imageElement);
               
