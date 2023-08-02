@@ -127,14 +127,17 @@
               <canvas id="myChart" style="width: 300px; height: 300px"></canvas>
             </div>
 
-            <!-- ⭐️スタンプ表示エリア -->
+            <!-- ⭐️スタンプ更新エリア -->
             <div class="flex flex-col items-center justify-center">
               <p class="w-full" id="output"></p>
             </div>
           </div>
         </div>
+
       </div>
     </section>
+    <!-- ⭐️スタンプ表示エリア -->
+    <div id="stampListContainer" class="container"></div>
 
     <!----------------------------------------------
     ⭐️選択した画像のプレビュー表示
@@ -325,6 +328,7 @@
         const countData = []; // countDataを初期化しておく
         const imageUrls = []; // imageUrlsを初期化しておく
 
+
         //----------------------------------------
         // id: 'ドキュメントのID',
         // data: {
@@ -361,6 +365,10 @@
 
           // imageUrlsにdocument.data.imgを追加
           imageUrls.push(document.data.img);
+
+        //----------------------------------------
+        // ▼スタンプ更新テーブルを表示する関数
+        //----------------------------------------
 
           tableRows += `
                     <tr style="height: 46px;" class="${rowStyleClass}">
@@ -407,7 +415,29 @@
                 `;
         $("#output").html(table);
 
-        // console.log("countData", countData, "imageUrls", imageUrls);
+        console.log("countData", countData, "imageUrls", imageUrls);
+
+        //----------------------------------------
+        // ▼スタンプを表示する関数
+        //----------------------------------------
+
+
+        const stampListContainer = document.getElementById('stampListContainer');
+
+        function renderImages() {
+          stampListContainer.innerHTML = '';          
+
+          imageUrls.forEach((imageUrl, index) => {
+            const imageElement = document.createElement('img');
+            imageElement.src = imageUrl;
+            imageElement.className = 'image';
+            stampListContainer.appendChild(imageElement);
+          });
+          console.log(stampListContainer.innerHTML)
+        }
+
+        renderImages();
+
 
         //----------------------------------------
         // ▼画像の更新関数

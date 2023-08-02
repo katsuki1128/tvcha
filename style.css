@@ -7,7 +7,6 @@ body {
     /* position: relative; */
 }
 
-
 /************************** 
 スタンプ登録エリア
 ***************************/
@@ -33,9 +32,25 @@ font-size: 20px;
     width: 100px;
     margin: 10px;
 }
+/************************** 
+スタンプ表示エリア
+***************************/
+
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .image {
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+  }
+
 
 /************************** 
-登録スタンプ表示画面
+登録スタンプ更新エリア
 ***************************/
 
 table {
