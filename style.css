@@ -1,0 +1,112 @@
+body {
+    /* width: 500px; */
+    /* background-image: url("./img/living_bg.jpg"); */
+    height: auto;
+    background-repeat: no-repeat;
+    /* left: 0px; */
+    /* position: relative; */
+}
+
+
+/************************** 
+スタンプ登録エリア
+***************************/
+
+input {
+    width: 100px;
+ } 
+
+.input-point {
+width: 60px;
+height: 30px;
+text-align: center;
+font-size: 20px; 
+}
+
+/* #imagePreview {
+    top: 20px;
+    left: 320px;
+    position: absolute;
+} */
+
+#imagePreview img{
+    width: 100px;
+    margin: 10px;
+}
+
+/************************** 
+登録スタンプ表示画面
+***************************/
+
+table {
+    border-collapse: collapse;
+    width: 530px;
+}
+
+td {
+    border: 0px solid black;
+    text-align: center;
+    }
+      
+      
+td img {
+    display: block;
+    margin: 0 auto;
+}
+
+
+.delete-btn {
+/* ボタン自体のスタイルを削除 */
+background: none;
+border: none;
+padding: 0;
+margin: 0;
+cursor: pointer;
+}
+
+.increment-btn {
+    /* ボタン自体のスタイルを削除 */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none; /* ボタンがフォーカスされたときの枠線を無効化 */
+    }
+
+.decrement-btn {
+    /* ボタン自体のスタイルを削除 */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none; /* ボタンがフォーカスされたときの枠線を無効化 */
+    }
+    
+
+.image_thumnail img{
+    width: 36px;
+}
+
+
+.even-row {
+    background-color: #e1e1f0; /* 偶数行の背景色を設定 */
+}
+
+.odd-row {
+    background-color: #ffffff; /* 奇数行の背景色を設定 */
+}
+
+
+
+ /************************** 
+チャートjs画面
+***************************/
+#chart_wrapper {
+    width: 300px;
+    /* top: 310px; */
+    /* left: 80px; */
+    /* position: absolute; */
+}
+
