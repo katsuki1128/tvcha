@@ -26,6 +26,7 @@ import {
   orderBy,
   updateDoc,
   onSnapshot,
+  increment
 } from "firebase/firestore";
   
 import { getStorage, ref } from "firebase/storage";
@@ -178,10 +179,6 @@ const handleItemClick = async (data, collection1, docId1, collection2, docId2) =
     console.error("カウントの更新中にエラーが発生しました:", error);
   }
 };
-
-
-
-
 
 
 //----------------------------------------

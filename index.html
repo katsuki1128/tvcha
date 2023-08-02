@@ -180,6 +180,7 @@
         updateDoc,
         getDocs,
         getDoc,
+        increment
       } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
       // firebase storageとやり取りをする設定
@@ -279,6 +280,20 @@
       });
 
       //----------------------------------------
+      // ▼スタンプクリック関数
+      //----------------------------------------
+
+      function handleItemClick(documentId) {
+        // Firestoreのドキュメント参照を作成
+        const docRef = doc(db, "tvcha", documentId);
+
+        // データを更新する
+        updateDoc(docRef, {
+          count: increment(1),
+        });
+      }
+
+      //----------------------------------------
       // ▼変更ボタン関数
       //----------------------------------------
 
@@ -316,13 +331,13 @@
 
       // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
       onSnapshot(q, (querySnapshot) => {
-        const documents = [];
+        const array = [];
         querySnapshot.docs.forEach(function (doc) {
           const document = {
             id: doc.id,
             data: doc.data(),
           };
-          documents.push(document);
+          array.push(document);
         });
 
         const pointData = []; // pointDataを初期化しておく
@@ -343,7 +358,7 @@
 
         let tableRows = "";
 
-        documents.forEach(function (document, index) {
+        array.forEach(function (document, index) {
           const deleteButton = `<button class="delete-btn" data-id="${document.id}"><i class="fas fa-trash"></i></button>`;
 
           // 奇数行と偶数行でスタイルを切り替える
@@ -357,7 +372,7 @@
 
           // indexが最後の行でない場合のみdecrementButtonを追加
           const decrementButton =
-            index !== documents.length - 1
+            index !== array.length - 1
               ? `<button class="decrement-btn" data-id="${document.id}"><i class="fa-solid fa-arrow-down"></i></button>`
               : "";
 
@@ -442,6 +457,11 @@
             const imageElement = document.createElement('img');
             imageElement.src = imageUrl;
             imageElement.className = 'image';
+            
+            // スタンプをクリックしたときにhandleStampClick関数を呼び出す
+            imageElement.addEventListener('click', () => handleItemClick(array[index].id));
+
+            
             imageWrapper.appendChild(imageElement);
             
             const pointElement = document.createElement('div');
@@ -590,7 +610,7 @@
           .off("click", ".decrement-btn")
           .on("click", ".decrement-btn", function () {
             const decrementDocId = $(this).data("id");
-            handleDecrementOrder(decrementDocId, documents);
+            handleDecrementOrder(decrementDocId, array);
           });
 
         //----------------------------------------
@@ -602,7 +622,7 @@
           .on("click", ".increment-btn", function () {
             isHandling = true; // 処理中のフラグをtrueに設定
             const incrementDocId = $(this).data("id");
-            handleIncrementOrder(incrementDocId, documents);
+            handleIncrementOrder(incrementDocId, array);
           });
 
         //----------------------------------------
@@ -628,7 +648,7 @@
               deleteDoc(deletedDocRef);
 
               // 他のドキュメントのプロパティのorderがdata.orderより等しい場合に1増やす
-              documents.forEach((document) => {
+              array.forEach((document) => {
                 if (document.data.order > deletedOrder) {
                   document.data.order -= 1;
                   console.log(document.id, document.data.order);
@@ -653,7 +673,7 @@
           "#bfb8c6",
           "#9e8f9e",
           "#1e1e33",
-        ].slice(0, documents.length);
+        ].slice(0, array.length);
 
         // チャートを作成する前に既存のチャートを破棄
         const existingChart = Chart.getChart("myChart");
@@ -702,7 +722,7 @@
       //----------------------------------------
 
       // 各行の「↓」アイコンをクリックしたときのイベントハンドラ
-      function handleDecrementOrder(decrementDocId, documents) {
+      function handleDecrementOrder(decrementDocId, array) {
         // 対応するドキュメントのデータを取得
         const decrementDocRef = doc(db, "tvcha", decrementDocId);
 
@@ -718,7 +738,7 @@
             updateDoc(decrementDocRef, decrementData);
 
             // 他のドキュメントのプロパティのorderがdata.orderより等しい場合に1増やす
-            documents.forEach((document) => {
+            array.forEach((document) => {
               if (
                 document.id !== decrementDocId &&
                 document.data.order === decrementData.order
@@ -742,7 +762,7 @@
       //----------------------------------------
 
       // 各行の「↑」アイコンをクリックしたときのイベントハンドラ
-      function handleIncrementOrder(incrementDocId, documents) {
+      function handleIncrementOrder(incrementDocId, array) {
         // 対応するドキュメントのデータを取得
         const incrementDocRef = doc(db, "tvcha", incrementDocId);
 
@@ -758,7 +778,7 @@
             updateDoc(incrementDocRef, incrementData);
 
             // 他のドキュメントのプロパティのorderがdata.orderより等しいもしくは少ない場合に1減らす
-            documents.forEach((document) => {
+            array.forEach((document) => {
               if (
                 document.id !== incrementDocId &&
                 document.data.order === incrementData.order
@@ -776,6 +796,50 @@
             console.error("ドキュメントの取得中にエラーが発生しました", error);
           });
       }
+
+      //----------------------------------------
+      // ▼firebaseに押された数を保存する
+      //----------------------------------------
+
+      // const handleItemClick = async (data, collection1, docId1, collection2, docId2) => {
+      //   try {
+          
+      //     console.log(data, document.data().point);
+      //     const currentCount = data.count;
+      //     const consumptionPoint = data.point;
+
+      //     const updatedCount = currentCount + 1;
+
+      //     // Firestoreのドキュメントを更新
+      //     await updateDoc(doc(db, collection1, docId1), {
+      //       count: updatedCount
+      //     });
+
+      //     if (collection2 && docId2) {
+      //       // Firestoreからcollection2とdocId2で指定されるドキュメントを取得
+      //       const docSnapshot = await getDoc(doc(db, collection2, docId2));
+      //       if (docSnapshot.exists()) {
+      //         const { point } = docSnapshot.data();
+
+      //         // ドキュメントのpointを使用して更新
+      //         await updateDoc(doc(db, collection2, docId2), {
+      //           point: point - consumptionPoint
+      //         });
+
+      //         console.log("カウントが正常に更新されました。");
+      //       } else {
+      //         console.log("指定されたドキュメントが存在しません。");
+      //       }
+      //     } else {
+      //       console.log("collection2とdocId2を指定してください。");
+      //     }
+      //   } catch (error) {
+      //     console.error("カウントの更新中にエラーが発生しました:", error);
+      //   }
+      // };
+
+
+
 
       //----------------------------------------
       // ▼時刻変換関数
