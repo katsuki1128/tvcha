@@ -36,11 +36,17 @@ font-size: 20px;
 スタンプ表示エリア
 ***************************/
 
-.container {
+
+#stampWrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.stampContainer {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    width: 320px;
+    justify-content: flex-start;
+    width: 400px;
 }
 
 .image-wrapper {

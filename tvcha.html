@@ -7,14 +7,11 @@
     <title>スタンプ作成画面</title>
 
     <!-- CSS & Tailwind -->
-    <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
+
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/flowbite@1.4.4/dist/flowbite.min.css"
-    />
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -50,10 +47,9 @@
 
     <!-- ⭐️同時配信イメージ -->
     <!-- <iframe src="tv_overlay.html" width="720" height="480"></iframe> -->
-
-
-
-    <div id="stampListContainer" class="container"></div>
+  <div id="stampWrapper">
+    <div id="stampListContainer" class="stampContainer"></div>
+  </div>
     <!-- ⭐️スタンプ一覧表示エリア -->
     <section class="bg-gray-200">
       <div
@@ -148,9 +144,6 @@
         element.appendChild(img);
       }
 
-
-      
-
       // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
       onSnapshot(q, (querySnapshot) => {
         const array = [];
@@ -229,13 +222,13 @@
 
         renderImages();
         
-
+      // console.log("pointData", pointData);
+      console.log("countData", countData);
+      // console.log(imageUrls);
         
      
       });
-      // console.log("pointData", pointData);
-      console.log("countData", countData);
-      console.log(imageUrls);
+
 
       
 
