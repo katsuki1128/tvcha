@@ -34,7 +34,8 @@
     <!----------------------------------------------
     ⭐️ここが大元！スタンプ生成ブロック  
     ------------------------------------------------->
-
+    <!-- ⭐️スタンプ表示エリア -->
+    <div id="stampListContainer" class="container"></div>
     <section class="bg-gray-200">
       <div
         class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto"
@@ -136,8 +137,7 @@
 
       </div>
     </section>
-    <!-- ⭐️スタンプ表示エリア -->
-    <div id="stampListContainer" class="container"></div>
+
 
     <!----------------------------------------------
     ⭐️選択した画像のプレビュー表示
@@ -325,6 +325,7 @@
           documents.push(document);
         });
 
+        const pointData = []; // pointDataを初期化しておく
         const countData = []; // countDataを初期化しておく
         const imageUrls = []; // imageUrlsを初期化しておく
 
@@ -360,6 +361,10 @@
               ? `<button class="decrement-btn" data-id="${document.id}"><i class="fa-solid fa-arrow-down"></i></button>`
               : "";
 
+          
+          // countDataにdocument.data.countを追加
+          pointData.push(document.data.point);
+          
           // countDataにdocument.data.countを追加
           countData.push(document.data.count);
 
@@ -394,6 +399,8 @@
               displayImage(downloadURL, imageElement);
             }
           );
+
+
         });
 
         const table = `
@@ -415,12 +422,13 @@
                 `;
         $("#output").html(table);
 
-        console.log("countData", countData, "imageUrls", imageUrls);
+        // console.log("countData", countData, "imageUrls", imageUrls);
 
         //----------------------------------------
         // ▼スタンプを表示する関数
         //----------------------------------------
 
+        console.log("pointData", pointData);
 
         const stampListContainer = document.getElementById('stampListContainer');
 
@@ -428,12 +436,22 @@
           stampListContainer.innerHTML = '';          
 
           imageUrls.forEach((imageUrl, index) => {
+            const imageWrapper = document.createElement('div');
+            imageWrapper.className = 'image-wrapper';
+            
             const imageElement = document.createElement('img');
             imageElement.src = imageUrl;
             imageElement.className = 'image';
-            stampListContainer.appendChild(imageElement);
+            imageWrapper.appendChild(imageElement);
+            
+            const pointElement = document.createElement('div');
+            pointElement.textContent = `${pointData[index]}`;
+            pointElement.className = 'point';
+            imageWrapper.appendChild(pointElement);
+            
+            stampListContainer.appendChild(imageWrapper);
           });
-          console.log(stampListContainer.innerHTML)
+          
         }
 
         renderImages();
