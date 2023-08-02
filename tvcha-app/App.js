@@ -119,7 +119,7 @@ const App = () => {
             style={styles.imagetv}
             source={require('./Sequence04.gif')} />
 
-        <Text style={{ fontSize: 36 }}>👇スタンプエリア</Text>
+        <Text style={{ fontSize: 36 }}>👇スタンプエリアだよ</Text>
           <View style={{ flex: 1 }}>
           <FlatList
             style={[styles.stampsContainer]}
