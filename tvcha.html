@@ -115,7 +115,7 @@
       const db = getFirestore(app);
 
       // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-      const q = query(collection(db, "tvcha"), orderBy("order", "desc"));
+      const q = query(collection(db, "tvcha"), orderBy("order", "asc"));
 
       //----------------------------------------
       // ▼スタンプクリック関数
@@ -225,8 +225,7 @@
               
               stampListContainer.appendChild(imageWrapper);
             });
-    
-          }
+        }
 
         renderImages();
         
