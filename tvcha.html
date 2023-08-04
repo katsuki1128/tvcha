@@ -20,7 +20,7 @@
 
   <body>
     <!----------------------------------------------
-    ⭐️スタンプ表示エリア  
+    ⭐️タイトル
     ------------------------------------------------->
     <section class="bg-gray-200">
       <div
@@ -47,17 +47,39 @@
 
     <!-- ⭐️同時配信イメージ -->
     <!-- <iframe src="tv_overlay.html" width="720" height="480"></iframe> -->
-  <div id="stampWrapper">
-    <div id="stampListContainer" class="stampContainer"></div>
-  </div>
-    <!-- ⭐️スタンプ一覧表示エリア -->
+   
+    <!----------------------------------------------
+    ⭐️スタンプ表示エリア  
+    ------------------------------------------------->  
+      <div id="stampWrapper">
+        <div id="stampListContainer" class="stampContainer"></div>
+      </div>
+   
+    <!----------------------------------------------
+    ⭐️ポイント表示エリア  
+    ------------------------------------------------->  
+
     <section class="bg-gray-200">
       <div
-        class="flex flex-col items-center justify-center px-6 pt-4 pb-4 mx-auto"
+        class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto"
       >
+        <div
+          class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0"
+        >
+          <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <div>
+              <div id="userPoint" class="userPoint"></div>
+
+            </div>
+          </div>
+        </div>
       </div>
     </section>
+
     <a href="./tv_overlay.html">→tv</a>
+
+
+
     <script type="module">
       //----------------------------------------
       // ▼firebaseプロジェクトとjavaScriptを連携させる
@@ -113,6 +135,9 @@
       // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
       const q = query(collection(db, "tvcha"), orderBy("order", "asc"));
 
+       // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+      const user_q = query(collection(db, "tvcha-user"));
+
       //----------------------------------------
       // ▼スタンプクリック関数
       //----------------------------------------
@@ -127,8 +152,23 @@
         });
       }
 
+       //----------------------------------------
+      // ▼スタンプクリック、ポイント減算関数
       //----------------------------------------
-      // ▼変更ボタン関数
+
+      function clickStampPoint(documentId) {
+        // Firestoreのドキュメント参照を作成
+        const docRef = doc(db, "tvcha-user", documentId);
+
+        // データを更新する
+        updateDoc(docRef, {
+          count: decrement(docRef.data.point),
+        });
+        console.log(count)
+      }
+
+      //----------------------------------------
+      // ▼変更ボタン関数cd 
       //----------------------------------------
 
       // 画像のダウンロード URL を取得して表示するための関数
@@ -229,8 +269,21 @@
      
       });
 
+      // onSnapshot(user_q, (querySnapshot) => {
+      //   const array2 = [];
+      //   querySnapshot.docs.forEach(function (doc) {
+      //     const document = {
+      //       id: doc.id,
+      //       data: doc.data(),
+      //     };
+      //     array2.push(document);
+      //   });
 
-      
+      //   console.log("Query 2:", array2[0].data.point);
+
+      //   clickStampPoint();
+      // });
+            
 
     </script>
   </body>
