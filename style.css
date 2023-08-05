@@ -45,22 +45,37 @@ font-size: 20px;
 .stampContainer {
     display: flex;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
     width: 400px;
+}
+
+.stampContainer:after{
+    content: "";
+    width: 90px;
+    height: 70px;
+  }
+
+.stampContainer:before{
+content: "";
+width: 90px;
+height: 70px;
+order: 1;
 }
 
 .image-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px; /* 画像とポイントの間に余白を設定 */
+    margin-bottom: 10px; /* 画像とポイントの間に余白を設定 */
 }
 
 .image {
-    width: 80px;
-    height: 80px; 
-    margin:10px
+    width: 70px;
+    height: 70px; 
+    margin: 10px 10px 0px 10px;
 }
+
+
 
 .point {
     font-size: 16px; /* ポイントのフォントサイズを設定 */
@@ -68,15 +83,9 @@ font-size: 20px;
 
 /* 透明度を指定するためのクラス */
 .clicked-image {
-    opacity: 0.5; /* 透明度の値を調整 */
+    opacity: 0.5; /* 初期の透明度 */
   }
   
-
-/* 透明度が変わるアニメーション */
-/* .clicked-image {
-transition: opacity 0.3s ease; /* 変化にかかる時間とイージング関数を調整できます */
-
-
 /************************** 
 登録スタンプ更新エリア
 ***************************/
