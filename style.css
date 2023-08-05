@@ -1,17 +1,17 @@
-@media (orientation: landscape) {
-        body {
-        /* width: 500px; */
-        /* background-image: url("./img/living_bg.jpg"); */
-        height: auto;
-        background-repeat: no-repeat;
-        /* left: 0px; */
-        /* position: relative; */
+
+body {
+    /* width: 500px; */
+    /* background-image: url("./img/living_bg.jpg"); */
+    height: auto;
+    background-repeat: no-repeat;
+    /* left: 0px; */
+    /* position: relative; */
 
 
-        text-size-adjust: 100%;
-        -webkit-text-size-adjust: 100%;
-    }
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
 }
+
 
 /************************** 
 スタンプ登録エリア
