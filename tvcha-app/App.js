@@ -28,7 +28,7 @@ import {
   onSnapshot,
   increment
 } from "firebase/firestore";
-  
+
 import { getStorage, ref } from "firebase/storage";
 
 const firebaseConfig = {
@@ -56,8 +56,8 @@ const storageRef = ref(storage);
 // ⭐️stampListという空の配列を作り、今後setStampListメソッドで
 // 更新していくことをuseState([])で定義
 const App = () => {
-    const [stampList, setStampList] = useState([]);
-    const [userList, setUserList] = useState([]);
+  const [stampList, setStampList] = useState([]);
+  const [userList, setUserList] = useState([]);
 
   // ⭐️初回読み込み時のみスタンプリストを読み込む
   useEffect(() => {
@@ -91,7 +91,7 @@ const App = () => {
       setUserList(newUserList);
     });
   }, []);
-    
+
   //----------------------------------------
   // スタンプをスクロールするための準備
   //----------------------------------------
@@ -99,7 +99,7 @@ const App = () => {
     <TouchableOpacity
       key={index} // ここで一意のkeyを設定する
       style={styles.stampContainer}
-      onPress={() => handleItemClick(item, "tvcha", item.id, "tvcha-user", userList[0].id)}
+      onPress={() => stampClick(item, item.id, userList[0].id)}
     >
       <Image style={styles.image} source={{ uri: item.img }} />
       <Text style={[styles.text, { textAlign: 'center' }]}>
@@ -108,76 +108,71 @@ const App = () => {
     </TouchableOpacity>
   );
 
-    
+
   //----------------------------------------
   // ▼画面描画内容
   //----------------------------------------
-    
-    return (  
-      <SafeAreaView style={[styles.container]}>
-        <Text style={{ fontSize: 36 }}>👇テレビをスマホに配信👇</Text>
-          <Image
-            style={styles.imagetv}
-            source={require('./Sequence04.gif')} />
 
-        <Text style={{ fontSize: 36 }}>👇スタンプエリア</Text>
-          <View style={{ flex: 1 }}>
-          <FlatList
-            style={[styles.stampsContainer]}
-            data={stampList}
-            renderItem={renderStampItem}
-            keyExtractor={(item, index) => index.toString()}
-            numColumns={4}
-          />
-          </View>
+  return (
+    <SafeAreaView style={[styles.container]}>
+      <Text style={{ fontSize: 36 }}>👇テレビをスマホに配信👇</Text>
+      <Image
+        style={styles.imagetv}
+        source={require('./Sequence04.gif')} />
+
+      <Text style={{ fontSize: 36 }}>👇スタンプエリア</Text>
+      <View style={{ flex: 1 }}>
+        <FlatList
+          style={[styles.stampsContainer]}
+          data={stampList}
+          renderItem={renderStampItem}
+          keyExtractor={(index) => index.toString()}
+          numColumns={4}
+        />
+      </View>
 
 
-        <Text style={{ fontSize: 36 }}>👇持ちポイント</Text>
-        <View>
-          <Text style={{ fontSize: 48 }}>
-            {userList.length > 0 ? userList[0].point : ''}
-          </Text>
-        </View>
-        
-       <StatusBar style="auto" />
+      <Text style={{ fontSize: 36 }}>👇持ちポイント</Text>
+      <View>
+        <Text style={{ fontSize: 48 }}>
+          {userList.length > 0 ? userList[0].point : ''}
+        </Text>
+      </View>
 
-      </SafeAreaView>
-    );
+      <StatusBar style="auto" />
+
+    </SafeAreaView>
+  );
 };
 
+
+
 //----------------------------------------
-// ▼firebaseに押された数を保存する
+// ▼スタンプがクリックされた時にfirebase上でのクリック数とポイント数を更新する
 //----------------------------------------
 
-const handleItemClick = async (data, collection1, docId1, collection2, docId2) => {
-  try {
-    const currentCount = data.count;
-    const consumptionPoint = data.point;
+const stampClick = async (data, stampId, userId) => {
+  console.log(data);
 
-    const updatedCount = currentCount + 1;
+  const clickedCount = data.count //クリックされたスタンプのそれまでのクリック数
+  const consumptionPoint = data.point //クリックされたスタンプの消費ポイント
 
-    // Firestoreのドキュメントを更新
-    await updateDoc(doc(db, collection1, docId1), {
-      count: updatedCount
-    });
+  // Firebaseのクリック数を一つ増やす
+  await updateDoc(doc(db, "tvcha", stampId), {
+    count: clickedCount + 1
+  });
 
-    // Firestoreからcollection2とdocId2で指定されるドキュメントを取得
-    const docSnapshot = await getDoc(doc(db, collection2, docId2));
-    if (docSnapshot.exists()) {
-      const { point } = docSnapshot.data();
+  // Firebaseからユーザーの情報を取得
+  const clickUser = await getDoc(doc(db, "tvcha-user", userId));
+  const userHavePoint = clickUser.data().point;  //ユーザーが持つポイント数
 
-      // ドキュメントのpointを使用して更新
-      await updateDoc(doc(db, collection2, docId2), {
-        point: point - consumptionPoint
-      });
+  // ドキュメントのpointを使用して更新
+  await updateDoc(doc(db, "tvcha-user", userId), {
+    point: userHavePoint - consumptionPoint
+  });
 
-      console.log("カウントが正常に更新されました。");
-    } else {
-      console.log("指定されたドキュメントが存在しません。");
-    }
-  } catch (error) {
-    console.error("カウントの更新中にエラーが発生しました:", error);
-  }
+  console.log("カウントが正常に更新されました。");
+
 };
 
 
