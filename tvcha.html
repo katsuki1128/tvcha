@@ -1,290 +1,301 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>スタンプ作成画面</title>
 
-    <!-- CSS & Tailwind -->
-    <link rel="stylesheet" href="reset.css" />
-    <link rel="stylesheet" href="style.css" />
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>スタンプ作成画面</title>
+
+  <!-- CSS & Tailwind -->
+  <link rel="stylesheet" href="reset.css" />
+  <link rel="stylesheet" href="style.css" />
 
 
-    <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
-  </head>
+</head>
 
-  <body>
-    <!----------------------------------------------
+<body>
+  <!----------------------------------------------
     ⭐️タイトル
     ------------------------------------------------->
-    <section class="bg-gray-200">
-      <div
-        class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto"
-      >
-        <div
-          class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0"
-        >
-          <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <div>
-              <a href="./index.html">
-              <img
-                class="w-40 h-15 mr-2"
-                src="./img/tvcha_logo.png"
-                alt="logo"
-              />
-              </a>
-            </div>
+  <section class="bg-gray-200">
+    <div class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto">
+      <div class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <div>
+            <a href="./index.html">
+              <img class="w-40 h-15 mr-2" src="./img/tvcha_logo.png" alt="logo" />
+            </a>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
 
-    <!-- ⭐️同時配信イメージ -->
-    <!-- <iframe src="tv_overlay.html" width="720" height="480"></iframe> -->
-   
-    <!----------------------------------------------
+  <!-- ⭐️同時配信イメージ -->
+  <!-- <iframe src="tv_overlay.html" width="720" height="480"></iframe> -->
+
+  <!----------------------------------------------
     ⭐️スタンプ表示エリア  
-    ------------------------------------------------->  
-      <div id="stampWrapper">
-        <div id="stampListContainer" class="stampContainer"></div>
-      </div>
-   
-    <!----------------------------------------------
+    ------------------------------------------------->
+  <div id="stampWrapper">
+    <div id="stampListContainer" class="stampContainer"></div>
+  </div>
+
+  <!----------------------------------------------
     ⭐️ポイント表示エリア  
-    ------------------------------------------------->  
+    ------------------------------------------------->
 
-    <section class="bg-gray-200">
-      <div
-        class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto"
-      >
-        <div
-          class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0"
-        >
-          <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <div>
-              <div id="userPoint" class="userPoint"></div>
-
-            </div>
+  <section class="bg-gray-200">
+    <div class="flex flex-col items-center justify-center px-6 pt-8 pb-4 mx-auto">
+      <div class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <div class="flex flex-col items-center">
+            <h2 class="text-xl font-semibold mb-2">所有ポイント</h2>
+            <div id="userPoint" class="text-2xl font-bold userPoint"></div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <a href="./tv_overlay.html">→tv</a>
+  <a href="./tv_overlay.html">→tv</a>
 
 
 
-    <script type="module">
-      //----------------------------------------
-      // ▼firebaseプロジェクトとjavaScriptを連携させる
-      //----------------------------------------
+  <script type="module">
+    //----------------------------------------
+    // ▼firebaseプロジェクトとjavaScriptを連携させる
+    //----------------------------------------
 
-      // 必要な機能をSDKからインポート
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    // 必要な機能をSDKからインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 
-      // firebase firestoreとやり取りをする設定
-      import {
-        getFirestore,
-        collection,
-        addDoc,
-        serverTimestamp,
-        query,
-        orderBy, //データのソート
-        onSnapshot, // Firestore 上に保存されているデータを取得
-        doc,
-        deleteDoc,
-        updateDoc,
-        getDocs,
-        getDoc,
-        increment
-      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    // firebase firestoreとやり取りをする設定
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy, //データのソート
+      onSnapshot, // Firestore 上に保存されているデータを取得
+      doc,
+      deleteDoc,
+      updateDoc,
+      getDocs,
+      getDoc,
+      increment,
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-      // firebase storageとやり取りをする設定
-      import {
-        getStorage,
-        ref,
-        uploadBytes,
-        getDownloadURL,
-      } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+    // firebase storageとやり取りをする設定
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL,
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 
-      // ウェブアプリのFirebaseの設定
-      const firebaseConfig = {
-        apiKey: "AIzaSyBs-rcINsUSZe7bD7OeLTrNcXm6-OInABg",
-        authDomain: "tvcha-9cae7.firebaseapp.com",
-        projectId: "tvcha-9cae7",
-        storageBucket: "tvcha-9cae7.appspot.com",
-        messagingSenderId: "866848033597",
-        appId: "1:866848033597:web:c6887382eb14ee58351354",
-      };
+    // ウェブアプリのFirebaseの設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyBs-rcINsUSZe7bD7OeLTrNcXm6-OInABg",
+      authDomain: "tvcha-9cae7.firebaseapp.com",
+      projectId: "tvcha-9cae7",
+      storageBucket: "tvcha-9cae7.appspot.com",
+      messagingSenderId: "866848033597",
+      appId: "1:866848033597:web:c6887382eb14ee58351354",
+    };
 
-      // Firebaseの初期化
-      const app = initializeApp(firebaseConfig);
+    // Firebaseの初期化
+    const app = initializeApp(firebaseConfig);
 
-      // FirebaseアプリとCloud Storageの連携を初期化しセットアップする
-      const storage = getStorage(app);
+    // FirebaseアプリとCloud Storageの連携を初期化しセットアップする
+    const storage = getStorage(app);
 
-      // dbに対してデータの追加や取得ができるようにする
-      const db = getFirestore(app);
+    // dbに対してデータの追加や取得ができるようにする
+    const db = getFirestore(app);
 
-      // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-      const q = query(collection(db, "tvcha"), orderBy("order", "asc"));
+    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+    const q = query(collection(db, "tvcha"), orderBy("order", "asc"));
 
-       // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-      const user_q = query(collection(db, "tvcha-user"));
+    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+    const user_q = query(collection(db, "tvcha-user"));
 
-      //----------------------------------------
-      // ▼スタンプクリック関数
-      //----------------------------------------
+    //----------------------------------------
+    // ▼スタンプクリック関数、ポイント減算関数
+    //----------------------------------------
+    const stampClick = async (stampId, userId) => {
 
-      function handleItemClick(documentId) {
-        // Firestoreのドキュメント参照を作成
-        const docRef = doc(db, "tvcha", documentId);
+      const clickedStamp = await getDoc(doc(db, "tvcha", stampId));
+      // console.log(clickedStamp);
 
-        // データを更新する
-        updateDoc(docRef, {
-          count: increment(1),
-        });
+      const clickedCount = clickedStamp.data().count //クリックされたスタンプのそれまでのクリック数
+      const consumptionPoint = clickedStamp.data().point //クリックされたスタンプの消費ポイント
+
+      // Firebaseのクリック数を一つ増やす
+      await updateDoc(doc(db, "tvcha", stampId), {
+        count: clickedCount + 1
+      });
+
+      // Firebaseからユーザーの情報を取得
+      const clickUser = await getDoc(doc(db, "tvcha-user", userId));
+
+      const userHavePoint = clickUser.data().point;  //ユーザーが持つポイント数
+
+      // ドキュメントのpointを使用して更新
+      await updateDoc(doc(db, "tvcha-user", userId), {
+        point: userHavePoint - consumptionPoint
+      });
+
+      console.log("カウントが正常に更新されました。");
+
+    };
+
+
+    //----------------------------------------
+    // ▼変更ボタン関数cd 
+    //----------------------------------------
+
+    // 画像のダウンロード URL を取得して表示するための関数
+    function displayImage(downloadURL, element) {
+      // すでに画像が表示されている場合は削除する
+      while (element.firstChild) {
+        element.removeChild(element.firstChild);
       }
 
-       //----------------------------------------
-      // ▼スタンプクリック、ポイント減算関数
+      // 新しい画像を表示
+      const img = document.createElement("img");
+      img.src = downloadURL;
+      element.appendChild(img);
+    }
+
+    // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
+    onSnapshot(q, (querySnapshot) => {
+      const array = [];
+      querySnapshot.docs.forEach(function (doc) {
+        const document = {
+          id: doc.id,
+          data: doc.data(),
+        };
+        array.push(document);
+      });
+
+      const imageUrls = []; // imageUrlsを初期化しておく
+      const pointData = []; // pointDataを初期化しておく
+      const countData = []; // countDataを初期化しておく
+      const arrayUser = []; // arrayUserを初期化しておく
+      //----------------------------------------
+      // id: 'ドキュメントのID',
+      // data: {
+      //      img: '画像のURL',
+      //      point: 'ポイント',
+      //      count: 'カウント',
+      //      time: '作成日時など'
+      // countData : 'カウントの配列',
+      // imageUrls : '画像のURLの配列'
       //----------------------------------------
 
-      function clickStampPoint(documentId) {
-        // Firestoreのドキュメント参照を作成
-        const docRef = doc(db, "tvcha-user", documentId);
+      array.forEach(function (document, index) {
 
-        // データを更新する
-        updateDoc(docRef, {
-          count: decrement(docRef.data.point),
-        });
-        console.log(count)
-      }
+        // countDataにdocument.data.countを追加
+        pointData.push(document.data.point);
+
+        // countDataにdocument.data.countを追加
+        countData.push(document.data.count);
+
+        // imageUrlsにdocument.data.imgを追加
+        imageUrls.push(document.data.img);
+
+      });
 
       //----------------------------------------
-      // ▼変更ボタン関数cd 
+      // ▼ユーザーのポイントを更新する関数
       //----------------------------------------
+      // 最初にリスナーを変数に格納
+      onSnapshot(user_q, (querySnapshot) => {
+        arrayUser.length = 0; // 配列をクリアして最新のデータを反映
 
-      // 画像のダウンロード URL を取得して表示するための関数
-      function displayImage(downloadURL, element) {
-        // すでに画像が表示されている場合は削除する
-        while (element.firstChild) {
-          element.removeChild(element.firstChild);
-        }
-
-        // 新しい画像を表示
-        const img = document.createElement("img");
-        img.src = downloadURL;
-        element.appendChild(img);
-      }
-
-      // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
-      onSnapshot(q, (querySnapshot) => {
-        const array = [];
         querySnapshot.docs.forEach(function (doc) {
           const document = {
             id: doc.id,
             data: doc.data(),
           };
-          array.push(document);
-        });   
-
-        const imageUrls = []; // imageUrlsを初期化しておく
-        const pointData = []; // pointDataを初期化しておく
-        const countData = []; // countDataを初期化しておく
-        //----------------------------------------
-        // id: 'ドキュメントのID',
-        // data: {
-        //      img: '画像のURL',
-        //      point: 'ポイント',
-        //      count: 'カウント',
-        //      time: '作成日時など'
-        // countData : 'カウントの配列',
-        // imageUrls : '画像のURLの配列'
-        //----------------------------------------
-
-
-        array.forEach(function (document, index) {
-          
-          // countDataにdocument.data.countを追加
-          pointData.push(document.data.point);
-          
-          // countDataにdocument.data.countを追加
-          countData.push(document.data.count);
-
-          // imageUrlsにdocument.data.imgを追加
-          imageUrls.push(document.data.img);
-
+          arrayUser.push(document);
         });
 
-        //----------------------------------------
-        // ▼スタンプを表示する関数
-        //----------------------------------------
-        const stampListContainer = document.getElementById('stampListContainer');
+        // console.log("arrayUser", arrayUser)
+        // console.log("userHavePoint:", arrayUser[1].data.point);
 
-        function renderImages() {
-            stampListContainer.innerHTML = '';          
-
-            imageUrls.forEach((imageUrl, index) => {
-              const imageWrapper = document.createElement('div');
-              imageWrapper.className = 'image-wrapper';
-              
-              const imageElement = document.createElement('img');
-              imageElement.src = imageUrl;
-              imageElement.className = 'image';
-              
-              // スタンプをクリックしたときにhandleStampClick関数を呼び出す
-              // imageElement.addEventListener('click', () => handleItemClick(array[index].id));
-              imageElement.addEventListener('click', () => {
-                handleItemClick(array[index].id);
-                imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
-                setTimeout(() => {
-                  imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
-                },2000); 
-              });
-              
-              imageWrapper.appendChild(imageElement);
-              
-              const pointElement = document.createElement('div');
-              pointElement.textContent = `${pointData[index]}`;
-              pointElement.className = 'point';
-              imageWrapper.appendChild(pointElement);
-              
-              stampListContainer.appendChild(imageWrapper);
-            });
+        const userPointElement = document.getElementById('userPoint');
+        if (userPointElement) {
+          userPointElement.textContent = arrayUser[1].data.point;
         }
+      });
 
-        renderImages();
-        
+      //----------------------------------------
+      // ▼スタンプを表示する関数
+      //----------------------------------------
+      const stampListContainer = document.getElementById('stampListContainer');
+
+      function renderImages() {
+        stampListContainer.innerHTML = '';
+
+        imageUrls.forEach((imageUrl, index) => {
+          const imageWrapper = document.createElement('div');
+          imageWrapper.className = 'image-wrapper';
+
+          const imageElement = document.createElement('img');
+          imageElement.src = imageUrl;
+          imageElement.className = 'image';
+
+          // スタンプをクリックしたときにhandlestampClick関数、clickStampPoint関数を呼び出す
+          imageElement.addEventListener('click', () => {
+            const stampId = array[index].id; // クリックされたドキュメントのIDを取得
+            const userId = arrayUser[1].id; // arrayUserの最初のドキュメントのIDを取得
+            // console.log(stampId, userId)
+
+            // cstampIdとuserIdを渡して処理を実行する
+            stampClick(stampId, userId);
+
+
+            // ボタンが押された時の挙動
+            imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
+            setTimeout(() => {
+              imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
+            }, 2000);
+          });
+
+          imageWrapper.appendChild(imageElement);
+
+          const pointElement = document.createElement('div');
+          pointElement.textContent = `${pointData[index]}`;
+          pointElement.className = 'point';
+          imageWrapper.appendChild(pointElement);
+
+          stampListContainer.appendChild(imageWrapper);
+        });
+      }
+
+      renderImages();
+
       // console.log("pointData", pointData);
       console.log("countData", countData);
       // console.log(imageUrls);
-        
-     
-      });
 
-      // onSnapshot(user_q, (querySnapshot) => {
-      //   const array2 = [];
-      //   querySnapshot.docs.forEach(function (doc) {
-      //     const document = {
-      //       id: doc.id,
-      //       data: doc.data(),
-      //     };
-      //     array2.push(document);
-      //   });
 
-      //   console.log("Query 2:", array2[0].data.point);
 
-      //   clickStampPoint();
-      // });
-            
 
-    </script>
-  </body>
+    });
+
+
+
+  </script>
+</body>
+
 </html>

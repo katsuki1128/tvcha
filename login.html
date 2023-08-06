@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>スタンプ作成画面</title>
+
+  <!-- CSS & Tailwind -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="reset.css" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.4/dist/flowbite.min.css" />
+
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+  <!-- fontAwesome -->
+  <script src="https://kit.fontawesome.com/e6a146d4cb.js" crossorigin="anonymous"></script>
+
+  <!-- FirebaseUI を追加 -->
+  <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+
+</head>
+
+<body>
+
+  <div>
+    <button id="login">LOGIN</button>
+  </div>
+
+
+
+  <script type="module">
+    //----------------------------------------
+    // ▼firebaseプロジェクトとjavaScriptを連携させる
+    //----------------------------------------
+
+    // 必要な機能をSDKからインポート
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+
+    // firebase firestoreとやり取りをする設定
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp,
+      query,
+      orderBy, //データのソート
+      onSnapshot, // Firestore 上に保存されているデータを取得
+      doc,
+      deleteDoc,
+      updateDoc,
+      getDocs,
+      getDoc,
+      increment
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    // firebase 認証
+    import {
+      getAuth,
+      signInWithPopup,
+      GoogleAuthProvider,
+      onAuthStateChanged,
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+    // ウェブアプリのFirebaseの設定
+    const firebaseConfig = {
+      apiKey: "AIzaSyBs-rcINsUSZe7bD7OeLTrNcXm6-OInABg",
+      authDomain: "tvcha-9cae7.firebaseapp.com",
+      projectId: "tvcha-9cae7",
+      storageBucket: "tvcha-9cae7.appspot.com",
+      messagingSenderId: "866848033597",
+      appId: "1:866848033597:web:c6887382eb14ee58351354",
+    };
+
+    // Firebaseの初期化
+    const app = initializeApp(firebaseConfig);
+
+    // FirebaseUI の初期化
+    // var ui = new firebaseui.auth.AuthUI(firebase.auth());
+
+    // GoogleAuth（認証用）
+    const provider = new GoogleAuthProvider();
+    provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
+    const auth = getAuth();
+
+    $("#login").on("click", function () {
+      signInWithPopup(auth, provider).then((result) => {
+        location.href = "index.html";
+      }).catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+
+
+    });
+    // ui.start('#firebaseui-auth-container', {
+    //   signInOptions: [
+    //     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    //   ],
+    // });
+  </script>
+</body>
+
+</html>
