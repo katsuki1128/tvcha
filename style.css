@@ -58,13 +58,13 @@ input {
 .stampContainer:after {
     content: "";
     width: 90px;
-    height: 70px;
+    height: 0px;
 }
 
 .stampContainer:before {
     content: "";
     width: 90px;
-    height: 70px;
+    height: 0px;
     order: 1;
 }
 
