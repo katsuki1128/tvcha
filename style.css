@@ -38,6 +38,54 @@ input {
     margin: 10px;
 }
 
+
+/************************** 
+チャートデバイス表示エリア
+***************************/
+
+
+.chart-device-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+/************************** 
+チャートjs画面
+***************************/
+#chart_wrapper {
+    width: 200px;
+    /* top: 310px; */
+    /* left: 80px; */
+    /* position: absolute; */
+}
+
+.myChart {
+    flex: 1;
+}
+
+/************************** 
+デバイスエリア
+***************************/
+.device {
+    flex: 1;
+    border-collapse: collapse;
+}
+
+
+.device td {
+    /* 枠線を黒色の点線に設定 */
+    border: 2px dashed gray;
+    /* セル内の余白を調整 */
+    padding: 10px;
+    /* 角丸の四角形に設定 */
+    border-radius: 20px;
+    /* セルの幅 */
+    width: 70px;
+    /* セルの高さ */
+    height: 70px;
+
+}
+
 /************************** 
 スタンプ表示エリア
 ***************************/
@@ -99,12 +147,12 @@ input {
 登録スタンプ更新エリア
 ***************************/
 
-table {
+#stampList table {
     border-collapse: collapse;
     width: 530px;
 }
 
-td {
+#stampList td {
     border: 0px solid black;
     text-align: center;
 }
@@ -164,16 +212,14 @@ td img {
 }
 
 
-
 /************************** 
-チャートjs画面
+ドラッグ＆ドロップ関数
 ***************************/
-#chart_wrapper {
-    width: 300px;
-    /* top: 310px; */
-    /* left: 80px; */
-    /* position: absolute; */
+.drag-over {
+    border: 2px solid blue;
+    /* ドラッグ中のセルの枠線を変更 */
 }
+
 
 /************************** 
 スマホ画面 ロゴ、説明エリア

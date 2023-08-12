@@ -92,9 +92,44 @@
           <h1 class="text-xl font-bold mb-3 leading-tight tracking-tight text-purple-800 md:text-2xl">
             スタンプ一覧
           </h1>
-          <!-- ⭐️円グラフ表示エリア -->
-          <div class="flex flex-col items-center justify-center" id="chart_wrapper">
-            <canvas id="myChart" style="width: 300px; height: 300px"></canvas>
+          <div class="chart-device-container">
+            <!-- ⭐️円グラフ表示エリア -->
+            <div class="flex flex-col items-center justify-center" id="chart_wrapper">
+              <canvas id="myChart" style="width: 300px; height: 300px"></canvas>
+            </div>
+
+            <!-- ⭐️テーブル表示エリア -->
+            <div>
+              <table class="device">
+                <tbody>
+                  <tr>
+                    <td id="cell01">01</td>
+                    <td id="cell02">02</td>
+                    <td id="cell03">03</td>
+                    <td id="cell04">04</td>
+                  </tr>
+                  <tr>
+                    <td id="cell05">05</td>
+                    <td id="cell06">06</td>
+                    <td id="cell07">07</td>
+                    <td id="cell08">08</td>
+                  </tr>
+                  <tr>
+                    <td id="cell09">09</td>
+                    <td id="cell10">10</td>
+                    <td id="cell11">11</td>
+                    <td id="cell12">12</td>
+                  </tr>
+                  <tr>
+                    <td id="cell13">13</td>
+                    <td id="cell14">14</td>
+                    <td id="cell15">15</td>
+                    <td id="cell16">16</td>
+                  </tr>
+                </tbody>
+
+              </table>
+            </div>
           </div>
 
           <!-- ⭐️スタンプ更新エリア -->
@@ -181,6 +216,9 @@
 
     // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
     const q = query(collection(db, "tvcha"), orderBy("order", "desc"));
+
+    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+    const device = query(collection(db, "device"), orderBy("order", "desc"));
 
     //----------------------------------------
     // ▼画像が選択された時のみ登録ボタンが有効になる
@@ -367,6 +405,9 @@
           (downloadURL) => {
             const imageElement = $(`#image-${index}`)[0];
             displayImage(downloadURL, imageElement);
+
+            // 画像要素にドラッグアンドドロップイベントリスナーを追加
+            $(imageElement).attr("draggable", true);
           }
         );
 
@@ -374,7 +415,7 @@
       });
 
       const table = `
-                <table class="w-full">
+                <table class="w-full" id="stampList">
                     <thead>
                     <tr>
                         <th>スタンプ</th>
@@ -478,11 +519,9 @@
                 return String.fromCharCode(s.charCodeAt(0) - 0xfee0);
               });
 
-              // エラーチェック：全角文字が含まれているかを検証
-              if (/^[^\x01-\x7E\xA1-\xDF]+$/.test(inputVal)) {
-                alert(
-                  "入力に全角文字が含まれています。半角文字のみ入力してください。"
-                );
+              // エラーチェック：半角英数字以外の文字が含まれているかを検証
+              if (/[^0-9]/.test(inputVal)) {
+                alert("半角英数字以外の文字が含まれています。半角英数字のみ入力してください。");
                 return;
               }
               // Firebaseのデータを更新する処理を追加
@@ -500,7 +539,8 @@
             let inputVal = $(this).val();
 
             // エラーチェック：全角文字が含まれているかを検証
-            if (/^[^\x01-\x7E\xA1-\xDF]+$/.test(inputVal)) {
+            if (/[^0-9]/.test(inputVal)) {
+              alert("半角英数字以外の文字が含まれています。半角英数字のみ入力してください。");
               return;
             }
 
@@ -633,6 +673,69 @@
           },
         },
       });
+
+
+      //----------------------------------------
+      // ▼画像のドラッグ＆ドロップの関数
+      //----------------------------------------
+      const draggableStamps = document.querySelectorAll(".image_thumnail");
+      console.log(draggableStamps);
+
+      const dropAreas = document.querySelectorAll(".device td"); // 全ての td 要素を選択
+      console.log(dropAreas);
+
+      let draggableStamp = "";
+
+      draggableStamps.forEach((stamp) => {
+        stamp.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", "");
+          draggableStamp = stamp; // 変数に要素を代入
+        });
+      });
+
+      dropAreas.forEach((dropArea) => {
+        dropArea.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropArea.style.border = "2px dashed red";
+        });
+
+        dropArea.addEventListener("dragleave", () => {
+          dropArea.style.border = "2px dashed gray"; // ドラッグリーブ時に枠を元に戻す
+
+        });
+
+        dropArea.addEventListener("drop", (e) => {
+          e.preventDefault(); // ドロップのデフォルトの動作をキャンセル
+          dropArea.style.border = "2px dashed gray"; // 枠を元に戻す
+
+          // ドロップされた画像のクローンを生成してドロップエリアに追加
+          const imageClone = draggableStamp.cloneNode(true); // 選択した画像要素をクローン
+
+          // すでに要素が存在する場合、新しい画像を追加する前に既存の要素をずらす
+          if (dropArea.children.length > 0) {
+            const existingImage = dropArea.querySelector(".image_thumnail");
+            console.log(existingImage);
+            dropArea.removeChild(existingImage); // 既存の画像を削除
+            dropArea.appendChild(imageClone);
+            console.log(dropArea);
+            // existingImage を一時的なコンテナ要素に追加
+            const container = document.createElement("div");
+            container.appendChild(existingImage);
+
+            // 隣の td 要素を取得（適切なセレクタを使用してください）
+            const nextTd = dropArea.nextElementSibling;
+
+            // コンテナ要素を隣の td 要素に追加
+            if (nextTd) {
+              nextTd.appendChild(container);
+            }
+          } else {
+            dropArea.appendChild(imageClone);
+          }
+
+
+        });
+      });
     });
 
     //----------------------------------------
@@ -714,49 +817,6 @@
           console.error("ドキュメントの取得中にエラーが発生しました", error);
         });
     }
-
-    //----------------------------------------
-    // ▼firebaseに押された数を保存する
-    //----------------------------------------
-
-    // const handleItemClick = async (data, collection1, docId1, collection2, docId2) => {
-    //   try {
-
-    //     console.log(data, document.data().point);
-    //     const currentCount = data.count;
-    //     const consumptionPoint = data.point;
-
-    //     const updatedCount = currentCount + 1;
-
-    //     // Firestoreのドキュメントを更新
-    //     await updateDoc(doc(db, collection1, docId1), {
-    //       count: updatedCount
-    //     });
-
-    //     if (collection2 && docId2) {
-    //       // Firestoreからcollection2とdocId2で指定されるドキュメントを取得
-    //       const docSnapshot = await getDoc(doc(db, collection2, docId2));
-    //       if (docSnapshot.exists()) {
-    //         const { point } = docSnapshot.data();
-
-    //         // ドキュメントのpointを使用して更新
-    //         await updateDoc(doc(db, collection2, docId2), {
-    //           point: point - consumptionPoint
-    //         });
-
-    //         console.log("カウントが正常に更新されました。");
-    //       } else {
-    //         console.log("指定されたドキュメントが存在しません。");
-    //       }
-    //     } else {
-    //       console.log("collection2とdocId2を指定してください。");
-    //     }
-    //   } catch (error) {
-    //     console.error("カウントの更新中にエラーが発生しました:", error);
-    //   }
-    // };
-
-
 
 
     //----------------------------------------
