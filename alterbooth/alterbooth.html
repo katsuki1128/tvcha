@@ -8,8 +8,8 @@
   <title>スタンプ作成画面</title>
 
   <!-- CSS & Tailwind -->
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="reset.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/reset.css" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.4/dist/flowbite.min.css" />
@@ -36,8 +36,8 @@
       <div class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <div>
-            <a href="./tvcha.html">
-              <img class="w-40 h-15 mr-2" src="./img/tvcha_logo.png" alt="logo" />
+            <a href="alterbooth_client.html">
+              <img class="w-full h-15 mr-2" src="img/geekersnight.png" alt="logo" />
             </a>
           </div>
 
@@ -98,39 +98,6 @@
             <canvas id="myChart" style="width: 300px; height: 300px"></canvas>
           </div>
 
-          <!-- ⭐️テーブル表示エリア -->
-          <!-- <div>
-              <table class="device">
-                <tbody>
-                  <tr>
-                    <td id="cell01">01</td>
-                    <td id="cell02">02</td>
-                    <td id="cell03">03</td>
-                    <td id="cell04">04</td>
-                  </tr>
-                  <tr>
-                    <td id="cell05">05</td>
-                    <td id="cell06">06</td>
-                    <td id="cell07">07</td>
-                    <td id="cell08">08</td>
-                  </tr>
-                  <tr>
-                    <td id="cell09">09</td>
-                    <td id="cell10">10</td>
-                    <td id="cell11">11</td>
-                    <td id="cell12">12</td>
-                  </tr>
-                  <tr>
-                    <td id="cell13">13</td>
-                    <td id="cell14">14</td>
-                    <td id="cell15">15</td>
-                    <td id="cell16">16</td>
-                  </tr>
-                </tbody>
-
-              </table>
-            </div>
-          </div> -->
 
           <!-- ⭐️スタンプ更新エリア -->
           <div class="flex flex-col items-center justify-center">
@@ -142,6 +109,8 @@
     </div>
   </section>
 
+  <a href="alter_field.html" target="_blank">出力先</a>
+  <i class="fas fa-external-link-alt"></i>
 
   <!----------------------------------------------
     ⭐️選択した画像のプレビュー表示
@@ -214,11 +183,11 @@
     // dbに対してデータの追加や取得ができるようにする
     const db = getFirestore(app);
 
-    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-    const q = query(collection(db, "tvcha"), orderBy("order", "desc"));
+    // コレクションの名前を定義
+    const collectionName = "alterbooth";
 
     // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-    const device = query(collection(db, "device"), orderBy("order", "desc"));
+    const q = query(collection(db, collectionName), orderBy("order", "desc"));
 
     //----------------------------------------
     // ▼画像が選択された時のみ登録ボタンが有効になる
@@ -240,7 +209,7 @@
 
       // Firestoreからドキュメント数を取得する関数
       async function getDocumentCount() {
-        const snapshot = await getDocs(collection(db, "tvcha"));
+        const snapshot = await getDocs(collection(db, collectionName));
         return snapshot.size;
       }
 
@@ -274,7 +243,7 @@
               time: serverTimestamp(),
             };
 
-            addDoc(collection(db, "tvcha"), postData).then(() => {
+            addDoc(collection(db, collectionName), postData).then(() => {
               console.log("データを Firestore に保存しました");
               $("#img, #point, #count, #order").val("");
               $("#send").prop("disabled", true); // 送信後、ボタンを無効化
@@ -292,7 +261,7 @@
 
     function updateFirebaseData(documentId, newPoint) {
       // Firestoreのドキュメント参照を作成
-      const docRef = doc(db, "tvcha", documentId);
+      const docRef = doc(db, collectionName, documentId);
 
       // データを更新する
       updateDoc(docRef, {
@@ -338,7 +307,6 @@
       const imageUrls = []; // imageUrlsを初期化しておく
 
       console.log(array);
-
       //----------------------------------------
       // id: 'ドキュメントのID',
       // data: {
@@ -371,7 +339,7 @@
             : "";
 
 
-        // countDataにdocument.data.countを追加
+        // pointDataにdocument.data.countを追加
         pointData.push(document.data.point);
 
         // countDataにdocument.data.countを追加
@@ -475,7 +443,7 @@
             })
             .then((downloadURL) => {
               // Firebase Firestoreの該当データの画像URLを更新する
-              const docRef = doc(db, "tvcha", documentId);
+              const docRef = doc(db, collectionName, documentId);
               console.log("ダウンロード⭐️URL:", downloadURL, docRef);
               updateDoc(docRef, {
                 img: downloadURL, // ダウンロードURLを指定してフィールドを更新
@@ -592,7 +560,7 @@
         .off("click", ".delete-btn")
         .on("click", ".delete-btn", function () {
           const deletedId = $(this).data("id");
-          const deletedDocRef = doc(db, "tvcha", deletedId);
+          const deletedDocRef = doc(db, collectionName, deletedId);
 
           // ドキュメントのデータを取得してorderプロパティの値を確認
           getDoc(deletedDocRef).then((deletedDoc) => {
@@ -612,7 +580,7 @@
                 document.data.order -= 1;
                 console.log(document.id, document.data.order);
 
-                updateDoc(doc(db, "tvcha", document.id), {
+                updateDoc(doc(db, collectionName, document.id), {
                   order: document.data.order,
                 }); // orderフィールドのみを更新
               }
@@ -674,72 +642,6 @@
           },
         },
       });
-
-
-      //----------------------------------------
-      // ▼画像のドラッグ＆ドロップの関数
-      //----------------------------------------
-      const draggableStamps = document.querySelectorAll(".image_thumnail");
-      // console.log(draggableStamps);
-
-      const dropAreas = document.querySelectorAll(".device td"); // 全ての td 要素を選択
-      // console.log(dropAreas);
-
-      let draggableStamp = "";
-
-      draggableStamps.forEach((stamp) => {
-        stamp.addEventListener("dragstart", (e) => {
-          e.dataTransfer.setData("text/plain", "");
-          draggableStamp = stamp; // 変数に要素を代入
-        });
-      });
-
-      dropAreas.forEach((dropArea) => {
-        dropArea.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          dropArea.style.border = "2px dashed red";
-        });
-
-        dropArea.addEventListener("dragleave", () => {
-          dropArea.style.border = "2px dashed gray"; // ドラッグリーブ時に枠を元に戻す
-
-        });
-
-        dropArea.addEventListener("drop", (e) => {
-          e.preventDefault(); // ドロップのデフォルトの動作をキャンセル
-          dropArea.style.border = "2px dashed gray"; // 枠を元に戻す
-
-          // const registeredStampId = 
-
-
-          // ドロップされた画像のクローンを生成してドロップエリアに追加
-          const imageClone = draggableStamp.cloneNode(true); // 選択した画像要素をクローン
-
-          // すでに要素が存在する場合、新しい画像を追加する前に既存の要素をずらす
-          if (dropArea.children.length > 0) {
-            const existingImage = dropArea.querySelector(".image_thumnail");
-            // console.log(existingImage);
-            dropArea.removeChild(existingImage); // 既存の画像を削除
-            dropArea.appendChild(imageClone);
-            console.log(dropArea);
-            // existingImage を一時的なコンテナ要素に追加
-            const container = document.createElement("div");
-            container.appendChild(existingImage);
-
-            // 隣の td 要素を取得（適切なセレクタを使用してください）
-            const nextTd = dropArea.nextElementSibling;
-
-            // コンテナ要素を隣の td 要素に追加
-            if (nextTd) {
-              nextTd.appendChild(container);
-            }
-          } else {
-            dropArea.appendChild(imageClone);
-          }
-
-
-        });
-      });
     });
 
     //----------------------------------------
@@ -749,7 +651,7 @@
     // 各行の「↓」アイコンをクリックしたときのイベントハンドラ
     function handleDecrementOrder(decrementDocId, array) {
       // 対応するドキュメントのデータを取得
-      const decrementDocRef = doc(db, "tvcha", decrementDocId);
+      const decrementDocRef = doc(db, collectionName, decrementDocId);
 
       getDoc(decrementDocRef)
         .then((decrementDoc) => {
@@ -770,7 +672,7 @@
             ) {
               document.data.order += 1;
               console.log("increment ID", document.id, document.data.order);
-              const incrementDocRef = doc(db, "tvcha", document.id); // ドキュメントの参照を取得
+              const incrementDocRef = doc(db, collectionName, document.id); // ドキュメントの参照を取得
               updateDoc(incrementDocRef, {
                 order: document.data.order,
               }); // orderフィールドのみを更新
@@ -789,7 +691,7 @@
     // 各行の「↑」アイコンをクリックしたときのイベントハンドラ
     function handleIncrementOrder(incrementDocId, array) {
       // 対応するドキュメントのデータを取得
-      const incrementDocRef = doc(db, "tvcha", incrementDocId);
+      const incrementDocRef = doc(db, collectionName, incrementDocId);
 
       getDoc(incrementDocRef)
         .then((inrementDoc) => {
@@ -810,7 +712,7 @@
             ) {
               document.data.order -= 1;
               // console.log("decrement ID", document.id, document.data.order);
-              const decrementDocRef = doc(db, "tvcha", document.id); // ドキュメントの参照を取得
+              const decrementDocRef = doc(db, collectionName, document.id); // ドキュメントの参照を取得
               updateDoc(decrementDocRef, {
                 order: document.data.order,
               }); // orderフィールドのみを更新
@@ -821,7 +723,6 @@
           console.error("ドキュメントの取得中にエラーが発生しました", error);
         });
     }
-
 
     //----------------------------------------
     // ▼時刻変換関数

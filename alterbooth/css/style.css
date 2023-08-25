@@ -1,0 +1,250 @@
+body {
+    /* width: 500px; */
+    /* background-image: url("./img/living_bg.jpg"); */
+    height: auto;
+    background-repeat: no-repeat;
+    /* left: 0px; */
+    /* position: relative; */
+
+
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+
+/************************** 
+スタンプ登録エリア
+***************************/
+
+input {
+    width: 100px;
+}
+
+.input-point {
+    width: 60px;
+    height: 30px;
+    text-align: center;
+    font-size: 20px;
+}
+
+/* #imagePreview {
+    top: 20px;
+    left: 320px;
+    position: absolute;
+} */
+
+#imagePreview img {
+    width: 100px;
+    margin: 10px;
+}
+
+
+/************************** 
+チャートデバイス表示エリア
+***************************/
+
+
+.chart-device-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+/************************** 
+チャートjs画面
+***************************/
+#chart_wrapper {
+    width: 200px;
+    /* top: 310px; */
+    /* left: 80px; */
+    /* position: absolute; */
+}
+
+.myChart {
+    flex: 1;
+}
+
+/************************** 
+デバイスエリア
+***************************/
+.device {
+    flex: 1;
+    border-collapse: collapse;
+}
+
+
+.device td {
+    /* 枠線を黒色の点線に設定 */
+    border: 2px dashed gray;
+    /* セル内の余白を調整 */
+    padding: 10px;
+    /* 角丸の四角形に設定 */
+    border-radius: 20px;
+    /* セルの幅 */
+    width: 70px;
+    /* セルの高さ */
+    height: 70px;
+
+}
+
+/************************** 
+スタンプ表示エリア
+***************************/
+
+
+#stampWrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.stampContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 400px;
+}
+
+.stampContainer:after {
+    content: "";
+    width: 90px;
+    height: 0px;
+}
+
+.stampContainer:before {
+    content: "";
+    width: 90px;
+    height: 0px;
+    order: 1;
+}
+
+.image-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px;
+    /* 画像とポイントの間に余白を設定 */
+}
+
+.image {
+    width: 70px;
+    height: 70px;
+    margin: 10px 10px 0px 10px;
+}
+
+
+
+.point {
+    font-size: 16px;
+    /* ポイントのフォントサイズを設定 */
+}
+
+/* 透明度を指定するためのクラス */
+.clicked-image {
+    opacity: 0.5;
+    /* 初期の透明度 */
+}
+
+/************************** 
+登録スタンプ更新エリア
+***************************/
+
+#stampList table {
+    border-collapse: collapse;
+    width: 530px;
+}
+
+#stampList td {
+    border: 0px solid black;
+    text-align: center;
+}
+
+
+td img {
+    display: block;
+    margin: 0 auto;
+}
+
+
+.delete-btn {
+    /* ボタン自体のスタイルを削除 */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.increment-btn {
+    /* ボタン自体のスタイルを削除 */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+    /* ボタンがフォーカスされたときの枠線を無効化 */
+}
+
+.decrement-btn {
+    /* ボタン自体のスタイルを削除 */
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+    /* ボタンがフォーカスされたときの枠線を無効化 */
+}
+
+
+.image_thumnail img {
+    width: 36px;
+}
+
+
+.even-row {
+    background-color: #e1e1f0;
+    /* 偶数行の背景色を設定 */
+}
+
+.odd-row {
+    background-color: #ffffff;
+    /* 奇数行の背景色を設定 */
+}
+
+
+/************************** 
+ドラッグ＆ドロップ関数
+***************************/
+.drag-over {
+    border: 2px solid blue;
+    /* ドラッグ中のセルの枠線を変更 */
+}
+
+
+/************************** 
+スマホ画面 ロゴ、説明エリア
+***************************/
+
+/* マウスオーバーしたときのカーソルのスタイルをポインタに設定 */
+a:hover {
+    cursor: pointer;
+}
+
+
+/************************** 
+スマホ画面 テレビ画面表示
+***************************/
+
+iframe {
+    border: none;
+    width: 400px;
+    height: 220px;
+}
+
+/************************** 
+スマホ画面 ポイント表示
+***************************/
+.userPoint {
+    display: inline-block;
+    /* 要素を横並びに表示 */
+}
