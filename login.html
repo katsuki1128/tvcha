@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>スタンプ作成画面</title>
+  <title>ログイン</title>
 
   <!-- CSS & Tailwind -->
   <link rel="stylesheet" href="style.css" />
@@ -17,14 +17,17 @@
   <!-- jQuery -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 
-  <!-- fontAwesome -->
-  <script src="https://kit.fontawesome.com/e6a146d4cb.js" crossorigin="anonymous"></script>
-
   <!-- FirebaseUI を追加 -->
-  <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+  <!-- <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script> -->
+  <!-- <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" /> -->
+
+  <script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.9.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth__ja.js"></script>
   <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
 
-</head>
+
+
 
 <body>
 
@@ -32,7 +35,23 @@
     <button id="login">LOGIN</button>
   </div>
 
+  <h1>User Registration</h1>
 
+  <div id="error-message" style="color: red;"></div>
+
+  <form id="registration-form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" required><br>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" required><br>
+
+    <button type="button" id="register-button">Register</button>
+  </form>
+
+  <h1>Welcome to My Awesome App</h1>
+  <div id="firebaseui-auth-container"></div>
+  <div id="loader">Loading...</div>
 
   <script type="module">
     //----------------------------------------
@@ -62,9 +81,11 @@
     // firebase 認証
     import {
       getAuth,
-      signInWithPopup,
+      // signInWithPopup,
       GoogleAuthProvider,
-      onAuthStateChanged,
+      // onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
     } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
     // ウェブアプリのFirebaseの設定
@@ -77,16 +98,72 @@
       appId: "1:866848033597:web:c6887382eb14ee58351354",
     };
 
+
     // Firebaseの初期化
     const app = initializeApp(firebaseConfig);
 
+    // let firebase = require('firebase');
+    // let firebaseui = require('firebaseui');
+
     // FirebaseUI の初期化
-    // var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    const ui = new firebaseui.auth.AuthUI(firebase.auth());
 
     // GoogleAuth（認証用）
     const provider = new GoogleAuthProvider();
     provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
     const auth = getAuth();
+
+    function registerUser() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log("User registered:", user);
+
+          // ユーザー登録後、自動的にログインする
+          signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              const user = userCredential.user;
+              console.log("User signed in:", user);
+
+              // ログイン成功後に index.html に遷移
+              window.location.href = "index.html";
+            });
+        });
+    }
+
+    const registerButton = document.getElementById("register-button");
+    registerButton.addEventListener("click", registerUser);
+
+    // UIの設定
+    let uiConfig = {
+      callbacks: {
+        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+          return true;
+        },
+        uiShown: function () {
+          document.getElementById('loader').style.display = 'none';
+        }
+      },
+      signInFlow: 'popup',
+      signInSuccessUrl: 'index.html',
+      signInOptions: [
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        // firebase.auth.FacebookAuthProvider.PROVIDER_ID,
+        // firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        // firebase.auth.GithubAuthProvider.PROVIDER_ID,
+        firebase.auth.EmailAuthProvider.PROVIDER_ID,
+        // firebase.auth.PhoneAuthProvider.PROVIDER_ID
+      ],
+      // Terms of service url.
+      tosUrl: '<your-tos-url>',
+      // Privacy policy url.
+      privacyPolicyUrl: '<your-privacy-policy-url>'
+    };
+
+    ui.start('#firebaseui-auth-container', uiConfig);
 
     $("#login").on("click", function () {
       signInWithPopup(auth, provider).then((result) => {

@@ -5,11 +5,11 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>tvcha</title>
+  <title>alterbooth</title>
 
   <!-- CSS & Tailwind -->
-  <link rel="stylesheet" href="reset.css" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/reset.css" />
+  <link rel="stylesheet" href="css/style.css" />
 
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -32,15 +32,11 @@
       <div class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <div>
-            <a href="./index.html">
-              <img class="w-40 h-15 mr-2" src="./img/tvcha_logo.png" alt="logo" />
-            </a>
-            <div class="text-sm mt-4 mb-0 mr-2 ml-2">
-              ⭐️この画面はスマホ推奨です⭐️<br>
-              スタンプをクリックすると
-              <a href="./tv_overlay.html" target="_blank">テレビ画面イメージ</a>
-              <i class="fas fa-external-link-alt"></i>
-              にスタンプがオーバーレイで表示されます。ユーザーは自身の所有ポイントを消費してスタンプを送ります。
+            <img class="w-full h-15 mr-2" src="img/geekersnight.png" alt="logo" />
+            <div class="text-xl mt-4 mb-0 mr-2 ml-2">
+              # スタンプをクリックして、思いをみんなでシェア！<br>
+              # イベントをどんどん盛り上げよう！<br>
+              # LTはちゃんと聞かなきゃダメだぞ！
             </div>
           </div>
         </div>
@@ -68,7 +64,7 @@
       <div class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <div class="flex flex-col items-center">
-            <h2 class="text-xl font-semibold mb-2">所有ポイント</h2>
+            <h2 class="text-xl font-semibold mb-2">イベント熱量</h2>
             <div id="userPoint" class="text-2xl font-bold userPoint"></div>
           </div>
         </div>
@@ -128,36 +124,40 @@
     // dbに対してデータの追加や取得ができるようにする
     const db = getFirestore(app);
 
-    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-    const q = query(collection(db, "tvcha"), orderBy("order", "asc"));
+    // コレクションの名前を定義
+    const collectionName = "alterbooth";
+    const collectionUsernName = "alter-user";
 
     // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
-    const user_q = query(collection(db, "tvcha-user"));
+    const q = query(collection(db, collectionName), orderBy("order", "desc"));
+
+    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+    const user_q = query(collection(db, collectionUsernName));
 
     //----------------------------------------
     // ▼スタンプクリック関数、ポイント減算関数
     //----------------------------------------
     const stampClick = async (stampId, userId) => {
 
-      const clickedStamp = await getDoc(doc(db, "tvcha", stampId));
+      const clickedStamp = await getDoc(doc(db, collectionName, stampId));
       // console.log(clickedStamp);
 
       const clickedCount = clickedStamp.data().count //クリックされたスタンプのそれまでのクリック数
       const consumptionPoint = clickedStamp.data().point //クリックされたスタンプの消費ポイント
 
       // Firebaseのクリック数を一つ増やす
-      await updateDoc(doc(db, "tvcha", stampId), {
+      await updateDoc(doc(db, collectionName, stampId), {
         count: clickedCount + 1
       });
 
       // Firebaseからユーザーの情報を取得
-      const clickUser = await getDoc(doc(db, "tvcha-user", userId));
+      // const clickUser = await getDoc(doc(db, collectionUsernName, userId));
 
-      const userHavePoint = clickUser.data().point;  //ユーザーが持つポイント数
+      // const userHavePoint = clickUser.data().point;  //ユーザーが持つポイント数
 
       // ドキュメントのpointを使用して更新
-      await updateDoc(doc(db, "tvcha-user", userId), {
-        point: userHavePoint - consumptionPoint
+      await updateDoc(doc(db, collectionUsernName, userId), {
+        point: increment(consumptionPoint)
       });
 
       console.log("カウントが正常に更新されました。");
@@ -166,7 +166,7 @@
 
 
     //----------------------------------------
-    // ▼変更ボタン関数cd 
+    // ▼変更ボタン関数
     //----------------------------------------
 
     // 画像のダウンロード URL を取得して表示するための関数
@@ -241,7 +241,7 @@
 
         const userPointElement = document.getElementById('userPoint');
         if (userPointElement) {
-          userPointElement.textContent = arrayUser[1].data.point;
+          userPointElement.textContent = arrayUser[0].data.point;
         }
       });
 
@@ -264,12 +264,11 @@
           // スタンプをクリックしたときにhandlestampClick関数、clickStampPoint関数を呼び出す
           imageElement.addEventListener('click', () => {
             const stampId = array[index].id; // クリックされたドキュメントのIDを取得
-            const userId = arrayUser[1].id; // arrayUserの最初のドキュメントのIDを取得
+            const userId = arrayUser[0].id; // arrayUserの最初のドキュメントのIDを取得
             // console.log(stampId, userId)
 
             // cstampIdとuserIdを渡して処理を実行する
             stampClick(stampId, userId);
-
 
             // ボタンが押された時の挙動
             imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
