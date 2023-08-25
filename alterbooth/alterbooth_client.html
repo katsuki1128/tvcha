@@ -248,6 +248,10 @@
       //----------------------------------------
       const stampListContainer = document.getElementById('stampListContainer');
 
+      // 画像要素を一度だけ作成
+      const imageElement = document.createElement('img');
+      imageElement.className = 'image';
+
       function renderImages() {
         stampListContainer.innerHTML = '';
 
