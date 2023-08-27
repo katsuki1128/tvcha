@@ -19,10 +19,10 @@
 <body>
     <!-- ⭐️スタンプ表示エリア -->
     <div
-        style="position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: gray;">
+        style="position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: white;">
         <img src="img/geekersnight.png"
             style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; z-index: 1;">
-        <canvas id="overlay" width="1600" height="1000"
+        <canvas id="overlay" width="1400" height="800"
             style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
     </div>
 
@@ -153,26 +153,63 @@
 
             // clickStampが更新されたら描画するための関数
             function drawImageOnCanvas() {
-
                 const image = new Image();
                 image.onload = function () {
+                    const targetX = (canvas.width) / 4 // 画面中央のX座標
+                    const targetY = (canvas.height) / 3 * 2; // 画面中央のY座標
+                    console.log(targetX, targetY);
+
                     let posX = 0; // 初期位置をCanvasの左端に設定
-                    let posY = canvas.height; // 初期位置をCanvasの底辺に設定
-                    let velocityY = -30; // 初速度を設定（下向きのため負の値）
-                    const gravity = 1.0; // 重力の影響を表す定数
+                    let posY = canvas.height / 3 * 1; // 初期位置をCanvasの中央に設定
+                    let velocityX = 45; // X軸方向の速度
+                    let velocityY = 0; // Y軸方向の速度
+
+                    let size = 0; // 初期サイズ
+                    const maxSize = 500; // 最大サイズ
+                    const growthRate = 2; // サイズの成長率
+
+                    const friction = 0.95; // 摩擦係数
+
+                    let alpha = 1.0; // 透明度
+                    let isAnimating = true; // アニメーション継続フラグ
 
                     function animate() {
-
                         ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
 
+                        // 速度を更新
+                        velocityX *= friction; // 摩擦を適用
+                        velocityY *= friction; // 摩擦を適用
+
                         // 位置を更新
-                        posX += 30; // 速度による位置の変化
-                        velocityY += gravity; // 重力による速度の増加
+                        posX += velocityX; // 速度による位置の変化
                         posY += velocityY; // 速度による位置の変化
 
-                        // スタンプを描画
-                        ctx.drawImage(image, posX, posY, 100, 100);
-                        requestAnimationFrame(animate);
+                        // サイズを更新
+                        if (size < 450) {
+                            size += growthRate; // 成長率によるサイズの増加
+                        } else if (size >= 400 && size < maxSize) {
+                            size += growthRate; // 400から500の間も成長を続ける
+                            alpha -= 0.05; // 透明度を下げる
+                        }
+                        console.log(size, alpha);
+
+                        if (alpha <= 0) {
+                            hasFadedOut = true; // 透明度が0になったらフラグを立てる
+                            alpha = 0; // 透明度が0のままキープする
+                        }
+
+                        ctx.globalAlpha = alpha; // 透明度を適用
+                        ctx.drawImage(image, posX, posY, size, size);
+                        ctx.globalAlpha = 1.0; // 透明度を元に戻す
+
+                        // 目標位置に近づいたら速度をゼロにする
+                        if (Math.abs(posX - targetX) < 1 && Math.abs(posY - targetY) < 1) {
+                            velocityX = 0;
+                            velocityY = 0;
+                            isAnimating = false;
+                        } else if (isAnimating) {
+                            requestAnimationFrame(animate);
+                        }
                     }
 
                     // アニメーションを開始
@@ -180,6 +217,51 @@
                 };
                 image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLが格納されていると仮定しています
             }
+
+            // function drawImageOnCanvas() {
+
+            //     const image = new Image();
+            //     image.onload = function () {
+            //         let posX = 0; // 初期位置をCanvasの左端に設定
+            //         let posY = canvas.height / 2; // 初期位置をCanvasの底辺に設定
+
+            //         // let velocityY = 2; // 初速度を設定（下向きのため負の値）
+            //         // const gravity = 0.1; // 重力の影響を表す定数
+
+            //         let velocityX = 2; // X方向の速度を設定
+            //         const targetX = canvas.width / 2; // 目標位置をCanvasの中央に設定
+
+            //         function animate() {
+
+            //             ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
+
+            //             // 位置を更新
+            //             if (posX < targetX) {
+            //                 posX += velocityX; // 速度による位置の変化
+            //             }
+
+            //             // スタンプを描画
+            //             ctx.drawImage(image, posX, posY, 100, 100);
+
+            //             if (posX < targetX) {
+            //                 requestAnimationFrame(animate);
+            //             }
+            //             //     // 位置を更新
+            //             //     // posX += 30; // 速度による位置の変化
+            //             //     posX += 2; // 速度による位置の変化
+            //             //     velocityY += gravity; // 重力による速度の増加
+            //             //     posY += velocityY; // 速度による位置の変化
+
+            //             //     // スタンプを描画
+            //             //     ctx.drawImage(image, posX, posY, 100, 100);
+            //             //     requestAnimationFrame(animate);
+            //         }
+
+            //         // アニメーションを開始
+            //         animate();
+            //     };
+            //     image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLが格納されていると仮定しています
+            // }
         });
     </script>
 </body>
