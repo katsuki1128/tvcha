@@ -91,36 +91,39 @@
         let clickStamp = "";
         const clickStamps = [];
         const canvas = document.getElementById('overlay');
+
         const ctx = canvas.getContext('2d');
         const stamps = []; // スタンプの情報を保持する配列
 
-        console.log("stamps", stamps);
+        // console.log("stamps", stamps);
 
         // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
         onSnapshot(q, (querySnapshot) => {
-            const documents = [];
+            // const documents = [];
 
-            querySnapshot.docs.forEach(function (doc) { //docsは配列 docはオブジェクト
-                const document = {
-                    id: doc.id, //ドキュメントID
-                    data: doc.data(), //ドキュメントの配列データ
-                };
-                documents.push(document); //配列の先頭に追加 
-
-            });
+            // querySnapshot.docs.forEach(function (doc) { //docsは配列 docはオブジェクト
+            //     const document = {
+            //         id: doc.id, //ドキュメントID
+            //         data: doc.data(), //ドキュメントの配列データ
+            //     };
+            //     documents.push(document); //配列の先頭に追加 
+            // });
+            // console.log("documents", documents);
 
             querySnapshot.docChanges().forEach((change) => {
-
-                clickStamp = change.doc.data().img;
-                clickStamps.push(clickStamp);
-                // console.log("クリックされたスタンプ配列", clickStamps);
-
-                drawImageOnCanvas(); // 画像をCanvas上に描画
+                if (change.type === "modified") {
+                    // console.log("クリックされました");
+                    const clickStamp = change.doc.data().img;
+                    clickStamps.push(clickStamp);
+                    // console.log("クリックされたスタンプ配列", clickStamps);
+                    console.log("クリックされたスタンプ", clickStamp);
+                    drawImageOnCanvas(); // 画像をCanvas上に描画
+                }
 
             });
 
-            const countData = []; // countDataを初期化しておく
-            const imageUrls = []; // imageUrlsを初期化しておく
+            // const countData = []; // countDataを初期化しておく
+            // const imageUrls = []; // imageUrlsを初期化しておく
 
 
             //----------------------------------------
@@ -138,26 +141,31 @@
             //----------------------------------------
             // ドキュメントをループしてcountDataとimageUrlsを作成
             //----------------------------------------
-            documents.forEach((document, index) => {
-                const {
-                    count,
-                    img
-                } = document.data;
-                countData.push(count);
-                imageUrls.push(img);
-            });
+            // documents.forEach((document, index) => {
+            //     const {
+            //         count,
+            //         img
+            //     } = document.data;
+            //     countData.push(count);
+            //     imageUrls.push(img);
+            // });
 
             //----------------------------------------
-            // ▼スタンプが放物線を描く
+            // ▼スタンプ描画関数
             //----------------------------------------
 
             // clickStampが更新されたら描画するための関数
             function drawImageOnCanvas() {
-                const image = new Image();
+
+                const image = document.createElement('img');
+                // console.log(image)
                 image.onload = function () {
-                    const targetX = (canvas.width) / 4 // 画面中央のX座標
-                    const targetY = (canvas.height) / 3 * 2; // 画面中央のY座標
-                    console.log(targetX, targetY);
+                    //----------------------------------------
+                    // ▼スタンプを配列に入れる
+                    //----------------------------------------
+                    const targetX = (canvas.width) / 4 - 100// 画面中央のX座標
+                    const targetY = (canvas.height) / 3 * 2 + 100; // 画面中央のY座標
+                    // console.log(targetX, targetY);
 
                     let posX = 0; // 初期位置をCanvasの左端に設定
                     let posY = canvas.height / 3 * 1; // 初期位置をCanvasの中央に設定
@@ -168,55 +176,89 @@
                     const maxSize = 500; // 最大サイズ
                     const growthRate = 2; // サイズの成長率
 
+
                     const friction = 0.95; // 摩擦係数
 
                     let alpha = 1.0; // 透明度
                     let isAnimating = true; // アニメーション継続フラグ
 
+                    //----------------------------------------
+                    // ▼スタンプを配列に入れる
+                    //----------------------------------------
+
+                    const stampInfo = {
+                        image: image,
+                        posX: posX,
+                        posY: posY,
+                        velocityX: velocityX,
+                        velocityY: velocityY,
+                        size: size,
+                        alpha: alpha,
+                        isAnimating: isAnimating,
+                    };
+                    // console.log("stampInfo", stampInfo);
+                    stamps.push(stampInfo);
+
+                    // console.log("stamps", stamps);
+
+                    //----------------------------------------
+                    // ▼アニメーションの関数
+                    //----------------------------------------
+
                     function animate() {
                         ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
 
                         // 速度を更新
-                        velocityX *= friction; // 摩擦を適用
-                        velocityY *= friction; // 摩擦を適用
+                        for (let i = 0; i < stamps.length; i++) {
 
-                        // 位置を更新
-                        posX += velocityX; // 速度による位置の変化
-                        posY += velocityY; // 速度による位置の変化
+                            const stamp = stamps[i];
 
-                        // サイズを更新
-                        if (size < 450) {
-                            size += growthRate; // 成長率によるサイズの増加
-                        } else if (size >= 400 && size < maxSize) {
-                            size += growthRate; // 400から500の間も成長を続ける
-                            alpha -= 0.05; // 透明度を下げる
+                            stamp.velocityX *= friction; // 摩擦を適用
+                            stamp.velocityY *= friction; // 摩擦を適用
+
+                            // 位置を更新
+                            stamp.posX += stamp.velocityX; // 速度による位置の変化
+                            stamp.posY += stamp.velocityY; // 速度による位置の変化
+                            // console.log(i, stamp.posX);
+                            // サイズを更新
+                            if (stamp.size < 450) {
+                                stamp.size += growthRate; // 成長率によるサイズの増加
+                            } else if (stamp.size >= 400 && stamp.size < maxSize) {
+                                stamp.size += growthRate; // 400から500の間も成長を続ける
+                                stamp.alpha -= 0.05; // 透明度を下げる
+                            }
+                            // console.log(stamp.alpha);
+                            // console.log(stamp.size);
+                            if (stamp.alpha <= 0) {
+                                stamp.alpha = 0; // 透明度が0のままキープする
+                                stamps.shift(); // 配列の先頭から削除
+                                // console.log("stamps", stamps);
+                            }
+
+                            ctx.globalAlpha = stamp.alpha; // 透明度を適用
+                            ctx.drawImage(stamp.image, stamp.posX, stamp.posY, stamp.size, stamp.size);
+                            ctx.globalAlpha = 1.0; // 透明度を元に戻す
+
+
+                            // console.log("stamps", stamps);
+
+                            // 目標位置に近づいたら速度をゼロにする
+                            if (Math.abs(stamp.posX - targetX) < 1 && Math.abs(stamp.posY - targetY) < 1) {
+                                stamp.velocityX = 0;
+                                stamp.velocityY = 0;
+                                stamp.isAnimating = false;
+                            }
+                            else if (stamp.isAnimating) {
+                                requestAnimationFrame(animate);
+                            }
                         }
-                        console.log(size, alpha);
-
-                        if (alpha <= 0) {
-                            hasFadedOut = true; // 透明度が0になったらフラグを立てる
-                            alpha = 0; // 透明度が0のままキープする
-                        }
-
-                        ctx.globalAlpha = alpha; // 透明度を適用
-                        ctx.drawImage(image, posX, posY, size, size);
-                        ctx.globalAlpha = 1.0; // 透明度を元に戻す
-
-                        // 目標位置に近づいたら速度をゼロにする
-                        if (Math.abs(posX - targetX) < 1 && Math.abs(posY - targetY) < 1) {
-                            velocityX = 0;
-                            velocityY = 0;
-                            isAnimating = false;
-                        } else if (isAnimating) {
-                            requestAnimationFrame(animate);
-                        }
-                    }
-
+                    };
                     // アニメーションを開始
                     animate();
                 };
                 image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLが格納されていると仮定しています
-            }
+                // console.log(image.src)
+            };
 
             // function drawImageOnCanvas() {
 
@@ -262,7 +304,12 @@
             //     };
             //     image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLが格納されていると仮定しています
             // }
+
+            // }
         });
+
+        // unsubscribe();
+
     </script>
 </body>
 
