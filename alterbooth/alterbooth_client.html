@@ -141,28 +141,28 @@
     // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
     const user_q = query(collection(db, collectionUsernName));
 
-    const ui = new firebaseui.auth.AuthUI(firebase.auth());
+    // const ui = new firebaseui.auth.AuthUI(firebase.auth());
 
-    // UIの設定
-    const uiConfig = {
-      callbacks: {
-        signInSuccessWithAuthResult: function (authResult, redirectUrl) {
-          return true;
-        },
-        uiShown: function () {
-          document.getElementById('loader').style.display = 'none';
-        }
-      },
-      signInFlow: 'popup',
-      signInSuccessUrl: 'alterbooth_client.html',
-      signInOptions: [
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      ],
-      tosUrl: '404.html',
-      privacyPolicyUrl: '404.html'
-    };
+    // // UIの設定
+    // const uiConfig = {
+    //   callbacks: {
+    //     signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+    //       return true;
+    //     },
+    //     uiShown: function () {
+    //       document.getElementById('loader').style.display = 'none';
+    //     }
+    //   },
+    //   signInFlow: 'popup',
+    //   signInSuccessUrl: 'alterbooth_client.html',
+    //   signInOptions: [
+    //     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    //   ],
+    //   tosUrl: '404.html',
+    //   privacyPolicyUrl: '404.html'
+    // };
 
-    ui.start('#firebaseui-auth-container', uiConfig);
+    // ui.start('#firebaseui-auth-container', uiConfig);
 
 
 
