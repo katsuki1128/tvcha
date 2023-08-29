@@ -87,6 +87,7 @@
         // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
         const q = query(collection(db, collectionName), orderBy("order", "desc"));
 
+
         // クリックされたスタンプのURLを格納する配列
         let clickStamp = "";
         const clickStamps = [];
@@ -124,10 +125,45 @@
                     //----------------------------------------
                     const targetX = (canvas.width) / 4 - 100// 画面中央のX座標
                     const targetY = (canvas.height) / 3 * 2 + 100; // 画面中央のY座標
+
                     // console.log(targetX, targetY);
+
+
+                    // // ランダムなX座標を計算（画面左端から画面右端までのランダムな値）
+                    // const randomX = Math.random() * canvas.width;
+
+                    // // ランダムなY座標を計算（画面上端から画面下端までのランダムな値）
+                    // const randomY = Math.random() * canvas.height;
+
+                    // // posX と posY を計算したランダムな座標に設定
+                    // let posX = randomX;
+                    // let posY = randomY;
 
                     let posX = 0; // 初期位置をCanvasの左端に設定
                     let posY = canvas.height / 3 * 1; // 初期位置をCanvasの中央に設定
+
+                    // let posX, posY, velocityX, velocityY;
+
+                    // if (Math.random() < 0.5) {
+                    //     posX = Math.random() * canvas.width;
+                    //     posY = Math.random() < 0.5 ? 0 : canvas.height;
+                    // } else {
+                    //     if (Math.random() < 0.5) {
+                    //         posX = 0;
+                    //         velocityX = 45
+                    //         posY = Math.random() * canvas.height;
+                    //     }
+                    //     else {
+                    //         posX = canvas.width;
+                    //         velocityX = -45
+                    //         posY = Math.random() * canvas.height;
+                    //     }
+                    //     // posX = Math.random() < 0.5 ? 0 : canvas.width;
+                    //     // posY = Math.random() * canvas.height;
+                    // }
+                    // // let velocityX = 45; // X軸方向の速度
+                    // velocityY = 0; // Y軸方向の速度
+
                     let velocityX = 45; // X軸方向の速度
                     let velocityY = 0; // Y軸方向の速度
 
@@ -165,7 +201,6 @@
                     function animate() {
                         ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
 
-                        const stampsToRemove = []; // 削除するスタンプのインデックスを保持する配列
 
                         // 速度を更新
                         for (let i = 0; i < stamps.length; i++) {
@@ -190,16 +225,16 @@
                             ctx.globalAlpha = stamp.alpha;
                             ctx.drawImage(stamp.image, stamp.posX, stamp.posY, stamp.size, stamp.size);
 
+
+
                             if (stamp.alpha <= 0) {
-                                stampsToRemove.push(i); // 削除するスタンプのインデックスを追加
+                                stamp.alpha = 0; // 透明度が0のままキープする
+                                stamps.shift(); // 配列の先頭から削除
+                                console.log("配列の先頭から削除しました", stamps);
+                                stamp.isAnimating = false;
                             }
                         }
 
-                        // 不要なスタンプを削除
-                        for (let i = stampsToRemove.length - 1; i >= 0; i--) {
-                            const indexToRemove = stampsToRemove[i];
-                            stamps.splice(indexToRemove, 1);
-                        }
 
                         if (stamps.length > 0) {
                             requestAnimationFrame(animate);
