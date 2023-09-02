@@ -62,7 +62,7 @@
   <!----------------------------------------------
     ⭐️ポイント表示エリア  
     ------------------------------------------------->
-
+  <!-- 
   <section class="bg-gray-200">
     <div class="flex flex-col items-center justify-center px-4 pt-4 pb-4 mx-auto">
       <div class="w-full bg-white rounded-lg shadow sm:max-w-3xl md:w-4/5 xl:p-0">
@@ -74,7 +74,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
 
   <!-- <div id="firebaseui-auth-container"></div>
   <div id="loader">Loading...</div>
@@ -257,10 +257,70 @@
       const img = document.createElement("img");
       img.src = downloadURL;
       element.appendChild(img);
+    };
+
+    //----------------------------------------
+    // ▼最初のスタンプ画像の読み込み
+    //----------------------------------------
+
+    const initialSnapshot = await getDocs(q);
+    const initialArray = [];
+    initialSnapshot.docs.forEach(function (doc) {
+      const document = {
+        id: doc.id,
+        data: doc.data(),
+      };
+      initialArray.push(document);
+    });
+    const initialImageUrls = []; // imageUrlsを初期化しておく
+    const initialPointData = []; // pointDataを初期化しておく
+
+    initialArray.forEach(function (document, index) {
+      // countDataにdocument.data.countを追加
+      initialPointData.push(document.data.point);
+      // imageUrlsにdocument.data.imgを追加
+      initialImageUrls.push(document.data.img);
+    });
+    // console.log("initialArray", initialArray.length, "initialImageUrls", initialImageUrls, "initialPointData", initialPointData);
+
+    const stampListContainer = document.getElementById('stampListContainer');
+
+    //----------------------------------------
+    // ▼スタンプを表示する関数
+    //----------------------------------------
+
+    const imageElements = [];
+
+    function renderImages() {
+      stampListContainer.innerHTML = '';
+
+      initialImageUrls.forEach((imageUrl, index) => {
+        const imageWrapper = document.createElement('div');
+        imageWrapper.className = 'image-wrapper';
+
+        const imageElement = document.createElement('img');
+        imageElement.src = imageUrl;
+        imageElement.className = 'image';
+        imageElements.push(imageElement)
+
+
+        imageWrapper.appendChild(imageElement);
+        const pointElement = document.createElement('div');
+        pointElement.textContent = `${initialPointData[index]}`;
+        pointElement.className = 'point';
+        imageWrapper.appendChild(pointElement);
+
+        stampListContainer.appendChild(imageWrapper);
+      });
     }
+    renderImages();
 
+    console.log(imageElements);
 
-    // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
+    //----------------------------------------
+    // ▼データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
+    //----------------------------------------
+
     onSnapshot(q, (querySnapshot) => {
       const array = [];
       querySnapshot.docs.forEach(function (doc) {
@@ -298,50 +358,27 @@
         imageUrls.push(document.data.img);
 
       });
+
       //----------------------------------------
-      // ▼スタンプを表示する関数
+      // ▼スタンプをクリックしたときにhandlestampClick関数、clickStampPoint関数を呼び出す
       //----------------------------------------
-      const stampListContainer = document.getElementById('stampListContainer');
+      imageElements.forEach((imageElement, index) => {
+        imageElement.addEventListener('click', () => {
+          const stampId = array[index].id; // クリックされたドキュメントのIDを取得
+          const userId = arrayUser[0].id; // arrayUserの最初のドキュメントのIDを取得
+          // console.log(stampId, userId)
 
-      function renderImages() {
-        stampListContainer.innerHTML = '';
+          // cstampIdとuserIdを渡して処理を実行する
+          stampClick(stampId, userId);
 
-        imageUrls.forEach((imageUrl, index) => {
-          const imageWrapper = document.createElement('div');
-          imageWrapper.className = 'image-wrapper';
-
-          const imageElement = document.createElement('img');
-          imageElement.src = imageUrl;
-          imageElement.className = 'image';
-
-          // スタンプをクリックしたときにhandlestampClick関数、clickStampPoint関数を呼び出す
-          imageElement.addEventListener('click', () => {
-            const stampId = array[index].id; // クリックされたドキュメントのIDを取得
-            const userId = arrayUser[0].id; // arrayUserの最初のドキュメントのIDを取得
-            // console.log(stampId, userId)
-
-            // cstampIdとuserIdを渡して処理を実行する
-            stampClick(stampId, userId);
-
-            // ボタンが押された時の挙動
-            imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
-            setTimeout(() => {
-              imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
-            }, 2000);
-          });
-
-          imageWrapper.appendChild(imageElement);
-
-          const pointElement = document.createElement('div');
-          pointElement.textContent = `${pointData[index]}`;
-          pointElement.className = 'point';
-          imageWrapper.appendChild(pointElement);
-
-          stampListContainer.appendChild(imageWrapper);
+          // ボタンが押された時の挙動
+          imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
+          setTimeout(() => {
+            imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
+          }, 300);
         });
-      }
+      });
 
-      renderImages();
       //----------------------------------------
       // ▼ユーザーのポイントを更新する関数
       //----------------------------------------
@@ -365,8 +402,6 @@
           userPointElement.textContent = arrayUser[0].data.point;
         }
       });
-
-
 
       // console.log("pointData", pointData);
       // console.log("countData", countData);
