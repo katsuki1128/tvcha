@@ -128,7 +128,7 @@
         function updateCanvasSize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            console.log(canvas.width, canvas.height)
+            // console.log(canvas.width, canvas.height)
             // キャンバスの再描画など追加の処理が必要な場合、ここで行うことができます。
         };
 
@@ -143,7 +143,7 @@
                     const clickStamp = change.doc.data().img;
                     clickStamps.push(clickStamp);
                     // console.log("クリックされたスタンプ配列", clickStamps);
-                    console.log("クリックされたスタンプ", clickStamp);
+                    // console.log("クリックされたスタンプ", clickStamp);
                     drawImageOnCanvas(); // 画像をCanvas上に描画
                 }
             });
@@ -170,7 +170,7 @@
                 const userPointElement = document.getElementById('userPoint');
                 if (userPointElement) {
                     userPointElement.textContent = arrayUser[0].data.point;
-                    console.log(userPointElement);
+                    // console.log(userPointElement);
                 }
 
             });
@@ -288,7 +288,7 @@
                             } else if (stamp.size >= 450 && stamp.size < maxSize) {
                                 stamp.size += growthRate; // 400から500の間も成長を続ける
                                 stamp.alpha -= 0.05; // 透明度を下げる
-                                // console.log(stamp.size, stamp.alpha)
+                                console.log(stamp.size, stamp.alpha)
                                 // 透明度が0未満になった場合、0に設定
                                 if (stamp.alpha < 0) {
                                     stamp.alpha = 0;
