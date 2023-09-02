@@ -22,8 +22,7 @@
         style="position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: white;">
         <img src="img/geekersnight.png"
             style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; z-index: 1;">
-        <canvas id="overlay" width="1400" height="800"
-            style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
+        <canvas id="overlay" style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
     </div>
 
     <script type="module">
@@ -92,8 +91,27 @@
         let clickStamp = "";
         const clickStamps = [];
         const canvas = document.getElementById('overlay');
-
         const ctx = canvas.getContext('2d');
+
+
+        //----------------------------------------
+        // ▼キャンバスサイズを設定
+        //----------------------------------------
+
+        // 初期サイズ設定
+        updateCanvasSize();
+
+        // ウィンドウのリサイズイベントを監視
+        window.addEventListener('resize', updateCanvasSize);
+
+        // キャンバスサイズをウィンドウの大きさに合わせて設定
+        function updateCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            console.log(canvas.width, canvas.height)
+            // キャンバスの再描画など追加の処理が必要な場合、ここで行うことができます。
+        };
+
         const stamps = []; // スタンプの情報を保持する配列
 
         // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
@@ -123,8 +141,8 @@
                     //----------------------------------------
                     // ▼基本パラメータを設定
                     //----------------------------------------
-                    const targetX = (canvas.width) / 4 - 100// 画面中央のX座標
-                    const targetY = (canvas.height) / 3 * 2 + 100; // 画面中央のY座標
+                    const targetX = (canvas.width) / 2// 画面中央のX座標
+                    const targetY = (canvas.height) / 2; // 画面中央のY座標
 
                     // console.log(targetX, targetY);
 
@@ -139,41 +157,40 @@
                     // let posX = randomX;
                     // let posY = randomY;
 
-                    let posX = 0; // 初期位置をCanvasの左端に設定
-                    let posY = canvas.height / 3 * 1; // 初期位置をCanvasの中央に設定
+                    // let posX = 0; // 初期位置をCanvasの左端に設定
+                    // let posY = canvas.height / 3 * 1; // 初期位置をCanvasの中央に設定
 
-                    // let posX, posY, velocityX, velocityY;
+                    let posX, posY, velocityX, velocityY;
 
-                    // if (Math.random() < 0.5) {
-                    //     posX = Math.random() * canvas.width;
-                    //     posY = Math.random() < 0.5 ? 0 : canvas.height;
-                    // } else {
-                    //     if (Math.random() < 0.5) {
-                    //         posX = 0;
-                    //         velocityX = 45
-                    //         posY = Math.random() * canvas.height;
-                    //     }
-                    //     else {
-                    //         posX = canvas.width;
-                    //         velocityX = -45
-                    //         posY = Math.random() * canvas.height;
-                    //     }
-                    //     // posX = Math.random() < 0.5 ? 0 : canvas.width;
-                    //     // posY = Math.random() * canvas.height;
-                    // }
-                    // // let velocityX = 45; // X軸方向の速度
-                    // velocityY = 0; // Y軸方向の速度
 
-                    let velocityX = 45; // X軸方向の速度
-                    let velocityY = 0; // Y軸方向の速度
+                    if (Math.random() < 0.5) {
+                        posX = 0;
+                        velocityX = 45
+                        posY = Math.random() * canvas.height;
+                    }
+                    else {
+                        posX = canvas.width;
+                        velocityX = -45
+                        posY = Math.random() * canvas.height;
+                    }
+                    // posX = Math.random() < 0.5 ? 0 : canvas.width;
+                    // posY = Math.random() * canvas.height;
+
+                    // let velocityX = 45; // X軸方向の速度
+                    velocityY = 0; // Y軸方向の速度
+
+                    // let velocityX = 45; // X軸方向の速度
+                    // let velocityY = 0; // Y軸方向の速度
 
                     let size = 0; // 初期サイズ
                     const maxSize = 500; // 最大サイズ
-                    const growthRate = 2; // サイズの成長率
+                    // const growthRate = 2; // サイズの成長率
                     const friction = 0.95; // 摩擦係数
 
                     let alpha = 1.0; // 透明度
                     let isAnimating = true; // アニメーション継続フラグ
+
+                    const initialGrowthRate = 2; // 初期の成長率
 
                     //----------------------------------------
                     // ▼スタンプを配列に入れる
@@ -201,7 +218,6 @@
                     function animate() {
                         ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
 
-
                         // 速度を更新
                         for (let i = 0; i < stamps.length; i++) {
 
@@ -215,17 +231,31 @@
                             stamp.posY += stamp.velocityY; // 速度による位置の変化
 
                             // サイズを更新
+                            const distanceToTarget = Math.sqrt((targetX - stamp.posX) ** 2 + (targetY - stamp.posY) ** 2);
+                            const growthRate = initialGrowthRate * (1 + distanceToTarget / canvas.width); // 距離に応じて成長率を調整
+
+
+                            // サイズを更新
                             if (stamp.size < 450) {
                                 stamp.size += growthRate; // 成長率によるサイズの増加
                             } else if (stamp.size >= 450 && stamp.size < maxSize) {
                                 stamp.size += growthRate; // 400から500の間も成長を続ける
                                 stamp.alpha -= 0.05; // 透明度を下げる
+                                console.log(stamp.size, stamp.alpha)
+                                // 透明度が0未満になった場合、0に設定
+                                if (stamp.alpha < 0) {
+                                    stamp.alpha = 0;
+                                }
                             }
 
                             ctx.globalAlpha = stamp.alpha;
-                            ctx.drawImage(stamp.image, stamp.posX, stamp.posY, stamp.size, stamp.size);
 
+                            // スタンプの中央座標を計算
+                            const centerX = stamp.posX + stamp.size / 2;
+                            const centerY = stamp.posY + stamp.size / 2;
 
+                            // スタンプの中央座標を中心に描画
+                            ctx.drawImage(stamp.image, centerX - stamp.size / 2, centerY - stamp.size / 2, stamp.size, stamp.size);
 
                             if (stamp.alpha <= 0) {
                                 stamp.alpha = 0; // 透明度が0のままキープする
@@ -235,24 +265,8 @@
                             }
                         }
 
-
                         if (stamps.length > 0) {
                             requestAnimationFrame(animate);
-
-                            // if (stamp.alpha > 0) {
-                            //     requestAnimationFrame(animate);
-                            //     console.log("アニメーション開始")
-                            // }
-                            // else {
-                            //     stamp.alpha = 0; // 透明度が0のままキープする
-                            //     stamps.shift(); // 配列の先頭から削除
-                            //     console.log("配列の先頭から削除しました", stamps);
-                            //     stamp.isAnimating = false;
-                            // }
-
-                            // ctx.globalAlpha = stamp.alpha; // 透明度を適用
-                            // ctx.drawImage(stamp.image, stamp.posX, stamp.posY, stamp.size, stamp.size);
-                            // // ctx.globalAlpha = 1.0; // 透明度を元に戻す
                         }
                     };
                     // アニメーションを開始
