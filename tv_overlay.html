@@ -90,9 +90,7 @@
         const ctx = canvas.getContext('2d');
         const stamps = []; // スタンプの情報を保持する配列
 
-
-
-        console.log("stamps", stamps);
+        // console.log("stamps", stamps);
 
         // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
         onSnapshot(q, (querySnapshot) => {
@@ -152,7 +150,8 @@
             //----------------------------------------
 
             function drawImageOnCanvas() {
-                const image = new Image();
+                const image = document.createElement('img');
+                console.log("imageができました", image)
                 image.onload = function () {
                     const centerX = canvas.width / 2;
                     const centerY = canvas.height / 2;
@@ -174,6 +173,10 @@
 
                     // console.log("velocityX", velocityX, "velocityY", velocityY);
 
+                    //----------------------------------------
+                    // ▼スタンプを配列に入れる
+                    //----------------------------------------
+
                     const stampInfo = {
                         image: image,
                         posX: posX,
@@ -193,7 +196,8 @@
                         ctx.fillStyle = "rgba(0, 0, 0, 0)";
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                        for (const stamp of stamps) {
+                        for (let i = 0; i < stamps.length; i++) {
+                            const stamp = stamps[i];
                             stamp.posX += stamp.velocityX;
                             stamp.posY += stamp.velocityY;
 
@@ -276,47 +280,47 @@
             //----------------------------------------
 
             // clickStampが更新されたら描画するための関数
-            function drawImageOnCanvas() {
+            // function drawImageOnCanvas() {
 
-                const image = new Image();
-                image.onload = function () {
-                    let posX = 0; // 初期位置をCanvasの左端に設定
-                    let posY = canvas.height; // 初期位置をCanvasの底辺に設定
-                    let velocityY = -18; // 初速度を設定（下向きのため負の値）
-                    const gravity = 0.5; // 重力の影響を表す定数
+            //     const image = new Image();
+            //     image.onload = function () {
+            //         let posX = 0; // 初期位置をCanvasの左端に設定
+            //         let posY = canvas.height; // 初期位置をCanvasの底辺に設定
+            //         let velocityY = -18; // 初速度を設定（下向きのため負の値）
+            //         const gravity = 0.5; // 重力の影響を表す定数
 
-                    function animate() {
+            //         function animate() {
 
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
+            //             ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
 
-                        // 位置を更新
-                        posX += 8; // 速度による位置の変化
-                        velocityY += gravity; // 重力による速度の増加
-                        posY += velocityY; // 速度による位置の変化
+            //             // 位置を更新
+            //             posX += 8; // 速度による位置の変化
+            //             velocityY += gravity; // 重力による速度の増加
+            //             posY += velocityY; // 速度による位置の変化
 
-                        // スタンプを描画
-                        ctx.drawImage(image, posX, posY, 100, 100);
+            //             // スタンプを描画
+            //             ctx.drawImage(image, posX, posY, 100, 100);
 
 
-                        //----------------------------------------
-                        // ▼スタンプを黒く塗りつぶすコード
-                        //----------------------------------------
+            //             //----------------------------------------
+            //             // ▼スタンプを黒く塗りつぶすコード
+            //             //----------------------------------------
 
-                        // ctx.globalCompositeOperation = 'source-over'; // 通常の描画モード
-                        // ctx.drawImage(image, posX, posY, 100, 100);
-                        // ctx.globalCompositeOperation = "source-atop";
-                        // ctx.fillStyle = 'black';
-                        // ctx.fillRect(posX, posY, 100, 100);
-                        // 次のフレームの描画をリクエスト
-                        requestAnimationFrame(animate);
-                    }
+            //             // ctx.globalCompositeOperation = 'source-over'; // 通常の描画モード
+            //             // ctx.drawImage(image, posX, posY, 100, 100);
+            //             // ctx.globalCompositeOperation = "source-atop";
+            //             // ctx.fillStyle = 'black';
+            //             // ctx.fillRect(posX, posY, 100, 100);
+            //             // 次のフレームの描画をリクエスト
+            //             requestAnimationFrame(animate);
+            //         }
 
-                    // アニメーションを開始
-                    animate();
+            //         // アニメーションを開始
+            //         animate();
 
-                };
-                image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLが格納されていると仮定しています
-            }
+            //     };
+            //     image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLが格納されていると仮定しています
+            // }
         });
     </script>
 </body>
