@@ -10,6 +10,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/reset.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -17,13 +18,29 @@
 </head>
 
 <body>
+    <!----------------------------------------------
+    ⭐️ポイント表示エリア  
+    ------------------------------------------------->
+
+    <section class="bg-gray-200">
+
+        <div class="flex flex-col items-center centered">
+            <h2 class="text-xl font-semibold mb-2">イベント熱量</h2>
+            <div id="userPoint" class="text-2xl font-bold userPoint"></div>
+        </div>
+
+    </section>
+
     <!-- ⭐️スタンプ表示エリア -->
     <div
         style="position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: white;">
-        <img src="img/geekersnight.png"
-            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; z-index: 1;">
+        <!-- <img src="img/geekersnight.png"
+            style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; z-index: 1;"> -->
+
         <canvas id="overlay" style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
     </div>
+
+
 
     <script type="module">
         //----------------------------------------
@@ -82,10 +99,13 @@
 
         // コレクションの名前を定義
         const collectionName = "alterbooth";
+        const collectionUsernName = "alter-user";
 
         // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
         const q = query(collection(db, collectionName), orderBy("order", "desc"));
 
+        // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+        const user_q = query(collection(db, collectionUsernName));
 
         // クリックされたスタンプのURLを格納する配列
         let clickStamp = "";
@@ -126,6 +146,33 @@
                     console.log("クリックされたスタンプ", clickStamp);
                     drawImageOnCanvas(); // 画像をCanvas上に描画
                 }
+            });
+
+            //----------------------------------------
+            // ▼ユーザーのポイントを更新する関数
+            //----------------------------------------
+            // 最初にリスナーを変数に格納
+            const arrayUser = []; // arrayUserを初期化しておく
+            onSnapshot(user_q, (querySnapshot) => {
+                arrayUser.length = 0; // 配列をクリアして最新のデータを反映
+
+                querySnapshot.docs.forEach(function (doc) {
+                    const document = {
+                        id: doc.id,
+                        data: doc.data(),
+                    };
+                    arrayUser.push(document);
+                });
+
+                // console.log("arrayUser", arrayUser)
+                // console.log("userHavePoint:", arrayUser[1].data.point);
+
+                const userPointElement = document.getElementById('userPoint');
+                if (userPointElement) {
+                    userPointElement.textContent = arrayUser[0].data.point;
+                    console.log(userPointElement);
+                }
+
             });
 
             //----------------------------------------
@@ -241,7 +288,7 @@
                             } else if (stamp.size >= 450 && stamp.size < maxSize) {
                                 stamp.size += growthRate; // 400から500の間も成長を続ける
                                 stamp.alpha -= 0.05; // 透明度を下げる
-                                console.log(stamp.size, stamp.alpha)
+                                // console.log(stamp.size, stamp.alpha)
                                 // 透明度が0未満になった場合、0に設定
                                 if (stamp.alpha < 0) {
                                     stamp.alpha = 0;
