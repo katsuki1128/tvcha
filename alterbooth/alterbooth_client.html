@@ -298,31 +298,6 @@
         imageUrls.push(document.data.img);
 
       });
-
-      //----------------------------------------
-      // ▼ユーザーのポイントを更新する関数
-      //----------------------------------------
-      // 最初にリスナーを変数に格納
-      onSnapshot(user_q, (querySnapshot) => {
-        arrayUser.length = 0; // 配列をクリアして最新のデータを反映
-
-        querySnapshot.docs.forEach(function (doc) {
-          const document = {
-            id: doc.id,
-            data: doc.data(),
-          };
-          arrayUser.push(document);
-        });
-
-        // console.log("arrayUser", arrayUser)
-        // console.log("userHavePoint:", arrayUser[1].data.point);
-
-        const userPointElement = document.getElementById('userPoint');
-        if (userPointElement) {
-          userPointElement.textContent = arrayUser[0].data.point;
-        }
-      });
-
       //----------------------------------------
       // ▼スタンプを表示する関数
       //----------------------------------------
@@ -367,13 +342,35 @@
       }
 
       renderImages();
+      //----------------------------------------
+      // ▼ユーザーのポイントを更新する関数
+      //----------------------------------------
+      // 最初にリスナーを変数に格納
+      onSnapshot(user_q, (querySnapshot) => {
+        arrayUser.length = 0; // 配列をクリアして最新のデータを反映
+
+        querySnapshot.docs.forEach(function (doc) {
+          const document = {
+            id: doc.id,
+            data: doc.data(),
+          };
+          arrayUser.push(document);
+        });
+
+        // console.log("arrayUser", arrayUser)
+        // console.log("userHavePoint:", arrayUser[1].data.point);
+
+        const userPointElement = document.getElementById('userPoint');
+        if (userPointElement) {
+          userPointElement.textContent = arrayUser[0].data.point;
+        }
+      });
+
+
 
       // console.log("pointData", pointData);
-      console.log("countData", countData);
+      // console.log("countData", countData);
       // console.log(imageUrls);
-
-
-
 
     });
 
