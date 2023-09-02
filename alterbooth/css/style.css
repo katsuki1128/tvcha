@@ -18,6 +18,14 @@ body {
     z-index: 1
 }
 
+.centered h2 {
+    font-size: 32px;
+    margin: 32px;
+}
+
+.centered div {
+    font-size: 96px;
+}
 
 /************************** 
 スタンプ登録エリア
