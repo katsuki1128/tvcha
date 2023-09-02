@@ -24,7 +24,7 @@
 
     <section class="bg-gray-200">
 
-        <div class="flex flex-col items-center centered">
+        <div class="flex flex-col items-center centered" style="z-index:2">
             <h2 class="text-xl font-semibold mb-2">イベント熱量</h2>
             <div id="userPoint" class="text-2xl font-bold userPoint"></div>
         </div>
@@ -37,7 +37,7 @@
         <img src="img/geekersnight.png"
             style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; z-index: 1;">
 
-        <canvas id="overlay" style="position: absolute; top: 0; left: 0; z-index: 2;"></canvas>
+        <canvas id="overlay" style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
     </div>
 
 
@@ -288,11 +288,6 @@
                             } else if (stamp.size >= 450 && stamp.size < maxSize) {
                                 stamp.size += growthRate; // 400から500の間も成長を続ける
                                 stamp.alpha -= 0.05; // 透明度を下げる
-                                console.log(stamp.size, stamp.alpha)
-                                // 透明度が0未満になった場合、0に設定
-                                if (stamp.alpha < 0) {
-                                    stamp.alpha = 0;
-                                }
                             }
 
                             ctx.globalAlpha = stamp.alpha;
@@ -304,14 +299,15 @@
                             // スタンプの中央座標を中心に描画
                             ctx.drawImage(stamp.image, centerX - stamp.size / 2, centerY - stamp.size / 2, stamp.size, stamp.size);
 
-                            if (stamp.alpha <= 0) {
-                                stamp.alpha = 0; // 透明度が0のままキープする
+                            if (stamp.alpha <= 0 || stamp.size > 500) {
+                                stamp.alpha = -10; // 透明度が0のままキープする
                                 stamps.shift(); // 配列の先頭から削除
+                                console.log(stamp.size, stamp.alpha)
                                 console.log("配列の先頭から削除しました", stamps);
                                 stamp.isAnimating = false;
+
                             }
                         }
-
                         if (stamps.length > 0) {
                             requestAnimationFrame(animate);
                         }
