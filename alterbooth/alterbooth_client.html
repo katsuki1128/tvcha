@@ -326,6 +326,13 @@
         const userId = initialUserArray[0].id; // arrayUserの最初のドキュメントのIDを取得
         // console.log(stampId, userId)
 
+        // クリックされていないスタンプの透明度を50%に設定
+        imageElements.forEach((otherImageElement, otherIndex) => {
+          if (otherIndex !== index) {
+            otherImageElement.style.opacity = '0.3';
+          }
+        });
+
         // stampIdとuserIdを渡して処理を実行する
         stampClick(stampId, userId);
 
@@ -336,9 +343,14 @@
         setTimeout(() => {
           imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
           isClickDisabled = false; // 一定時間後にクリックを再度有効にする
+          imageElements.forEach((otherImageElement, otherIndex) => {
+            if (otherIndex !== index) {
+              otherImageElement.style.opacity = '1';
+            }
+          });
         }, 5000);
 
-        console.log(isClickDisabled);
+        // console.log(imageElements[clickedStampIndex]);
 
       });
     });
