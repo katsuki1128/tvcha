@@ -346,11 +346,11 @@
         setTimeout(() => {
           imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
           isClickDisabled = false; // 一定時間後にクリックを再度有効にする
-          imageElements.forEach((otherImageElement, otherIndex) => {
-            if (otherIndex !== index) {
-              otherImageElement.style.opacity = '1';
-            }
-          });
+          // imageElements.forEach((otherImageElement, otherIndex) => {
+          //   if (otherIndex !== index) {
+          //     otherImageElement.style.opacity = '1';
+          //   }
+          // });
         }, 7000);
 
         // console.log(imageElements[clickedStampIndex]);
