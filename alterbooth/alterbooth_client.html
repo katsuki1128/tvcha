@@ -311,21 +311,35 @@
     //----------------------------------------
     // ▼クリックされたスタンプのIDを取得する関数
     //----------------------------------------
+
+    let isClickDisabled = false; // クリック無効フラグ
+
     // 画像要素にクリックイベントリスナーを追加
     imageElements.forEach((imageElement, index) => {
       imageElement.addEventListener('click', () => {
+
+        if (isClickDisabled) {
+          return; // クリックが無効なら何もしない
+        };
+
         const stampId = initialArray[index].id; // クリックされたドキュメントのIDを取得
         const userId = initialUserArray[0].id; // arrayUserの最初のドキュメントのIDを取得
-        console.log(stampId, userId)
+        // console.log(stampId, userId)
 
         // stampIdとuserIdを渡して処理を実行する
         stampClick(stampId, userId);
 
         // ボタンが押された時の挙動
         imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
+        isClickDisabled = true; // クリックを無効化
+
         setTimeout(() => {
           imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
+          isClickDisabled = false; // 一定時間後にクリックを再度有効にする
         }, 5000);
+
+        console.log(isClickDisabled);
+
       });
     });
 
