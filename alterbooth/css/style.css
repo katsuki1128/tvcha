@@ -153,22 +153,24 @@ input {
 @keyframes bounceAndExit {
 
     0%,
-    20%,
-    50%,
-    80%,
-    100% {
+    20% {
         transform: translateY(0);
         /* Y軸方向に移動しない */
     }
 
-    40% {
-        transform: translateY(-20px);
-        /* Y軸方向に-20px移動 */
+    30% {
+        transform: translateY(10px);
+        /* Y軸方向に10px移動 */
+    }
+
+    50% {
+        transform: translateY(20px);
+        /* Y軸方向に20px移動 */
     }
 
     60% {
-        transform: translateY(-10px);
-        /* Y軸方向に-10px移動 */
+        transform: translateY(10px);
+        /* Y軸方向に10px移動 */
     }
 
     100% {

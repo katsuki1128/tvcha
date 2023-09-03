@@ -318,20 +318,20 @@
     imageElements.forEach((imageElement, index) => {
       imageElement.addEventListener('click', () => {
 
-        if (isClickDisabled) {
-          return; // クリックが無効なら何もしない
-        };
+        // if (isClickDisabled) {
+        //   return; // クリックが無効なら何もしない
+        // };
 
         const stampId = initialArray[index].id; // クリックされたドキュメントのIDを取得
         const userId = initialUserArray[0].id; // arrayUserの最初のドキュメントのIDを取得
         // console.log(stampId, userId)
 
         // クリックされていないスタンプの透明度を50%に設定
-        imageElements.forEach((otherImageElement, otherIndex) => {
-          if (otherIndex !== index) {
-            otherImageElement.style.opacity = '0.3';
-          }
-        });
+        // imageElements.forEach((otherImageElement, otherIndex) => {
+        //   if (otherIndex !== index) {
+        //     otherImageElement.style.opacity = '0.3';
+        //   }
+        // });
 
 
         setTimeout(() => {
