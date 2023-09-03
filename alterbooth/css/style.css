@@ -120,6 +120,30 @@ input {
     width: 70px;
     height: 70px;
     margin: 10px 10px 0px 10px;
+    /* フェードインアニメーションを適用 */
+    animation-name: fadeInImage;
+    /* アニメーションの時間を調整 */
+    animation-duration: 0.5s;
+    /* タイミング関数を指定 */
+    animation-timing-function: ease;
+    /* アニメーションの繰り返し回数を指定 */
+    animation-iteration-count: 1;
+    /* アニメーション完了後に最終スタイルを保持 */
+    animation-fill-mode: forwards;
+
+}
+
+/* 画像がフェードインするアニメーションのキーフレーム */
+@keyframes fadeInImage {
+    0% {
+        opacity: 0;
+        /* 初期状態で透明 */
+    }
+
+    100% {
+        opacity: 1;
+        /* 終了時に完全に表示 */
+    }
 }
 
 
@@ -178,6 +202,8 @@ input {
         /* Y軸方向に画面の高さ分 (-100vh) 移動 */
     }
 }
+
+
 
 /************************** 
 登録スタンプ更新エリア
