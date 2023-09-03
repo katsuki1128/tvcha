@@ -130,9 +130,51 @@ input {
 }
 
 /* 透明度を指定するためのクラス */
+/* .clicked-image { */
+/* opacity: 0.5; */
+/* 初期の透明度 */
+/* } */
+
+/* スタンプがクリックされたときのアニメーション */
 .clicked-image {
-    opacity: 0.5;
-    /* 初期の透明度 */
+    animation-name: bounceAndExit;
+    /* アニメーション名を指定 */
+    animation-duration: 1s;
+    /* アニメーションの時間を調整 */
+    animation-timing-function: ease;
+    /* タイミング関数を指定 */
+    animation-iteration-count: 1;
+    /* アニメーションの繰り返し回数を指定 */
+    animation-fill-mode: forwards;
+    /* アニメーション完了後に最終スタイルを保持 */
+}
+
+/* スタンプが跳ねるアニメーションのキーフレーム */
+@keyframes bounceAndExit {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+        /* Y軸方向に移動しない */
+    }
+
+    40% {
+        transform: translateY(-20px);
+        /* Y軸方向に-20px移動 */
+    }
+
+    60% {
+        transform: translateY(-10px);
+        /* Y軸方向に-10px移動 */
+    }
+
+    100% {
+        transform: translateY(-100vh);
+        /* Y軸方向に画面の高さ分 (-100vh) 移動 */
+    }
 }
 
 /************************** 

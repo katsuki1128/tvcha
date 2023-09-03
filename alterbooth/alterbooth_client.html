@@ -300,16 +300,10 @@
         count: increment(1)
       });
 
-      // Firebaseからユーザーの情報を取得
-      // const clickUser = await getDoc(doc(db, collectionUsernName, userId));
-
-      // const userHavePoint = clickUser.data().point;  //ユーザーが持つポイント数
-
       // ドキュメントのpointを使用して更新
       await updateDoc(doc(db, collectionUsernName, userId), {
         point: increment(consumptionPoint)
       });
-
       console.log("カウントが正常に更新されましたよ。");
 
     };
@@ -331,7 +325,7 @@
         imageElement.classList.add('clicked-image'); // クリックされたら 'clicked-image' クラスを追加
         setTimeout(() => {
           imageElement.classList.remove('clicked-image'); // 一定時間経過後に 'clicked-image' クラスを削除
-        }, 300);
+        }, 5000);
       });
     });
 
@@ -358,43 +352,43 @@
     // ▼データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
     //----------------------------------------
 
-    onSnapshot(q, (querySnapshot) => {
-      const array = [];
-      querySnapshot.docs.forEach(function (doc) {
-        const document = {
-          id: doc.id,
-          data: doc.data(),
-        };
-        array.push(document);
-      });
+    // onSnapshot(q, (querySnapshot) => {
+      // const array = [];
+      // querySnapshot.docs.forEach(function (doc) {
+      //   const document = {
+      //     id: doc.id,
+      //     data: doc.data(),
+      //   };
+      //   array.push(document);
+      // });
 
-      const imageUrls = []; // imageUrlsを初期化しておく
-      const pointData = []; // pointDataを初期化しておく
-      const countData = []; // countDataを初期化しておく
-      const arrayUser = []; // arrayUserを初期化しておく
-      //----------------------------------------
-      // id: 'ドキュメントのID',
-      // data: {
-      //      img: '画像のURL',
-      //      point: 'ポイント',
-      //      count: 'カウント',
-      //      time: '作成日時など'
-      // countData : 'カウントの配列',
-      // imageUrls : '画像のURLの配列'
-      //----------------------------------------
+      // const imageUrls = []; // imageUrlsを初期化しておく
+      // const pointData = []; // pointDataを初期化しておく
+      // const countData = []; // countDataを初期化しておく
+      // const arrayUser = []; // arrayUserを初期化しておく
+      // //----------------------------------------
+      // // id: 'ドキュメントのID',
+      // // data: {
+      // //      img: '画像のURL',
+      // //      point: 'ポイント',
+      // //      count: 'カウント',
+      // //      time: '作成日時など'
+      // // countData : 'カウントの配列',
+      // // imageUrls : '画像のURLの配列'
+      // //----------------------------------------
 
-      array.forEach(function (document, index) {
+      // array.forEach(function (document, index) {
 
-        // countDataにdocument.data.countを追加
-        pointData.push(document.data.point);
+      //   // countDataにdocument.data.countを追加
+      //   pointData.push(document.data.point);
 
-        // countDataにdocument.data.countを追加
-        countData.push(document.data.count);
+      //   // countDataにdocument.data.countを追加
+      //   countData.push(document.data.count);
 
-        // imageUrlsにdocument.data.imgを追加
-        imageUrls.push(document.data.img);
+      //   // imageUrlsにdocument.data.imgを追加
+      //   imageUrls.push(document.data.img);
 
-      });
+      // });
 
       //----------------------------------------
       // ▼スタンプをクリックしたときにhandlestampClick関数、clickStampPoint関数を呼び出す
@@ -420,31 +414,31 @@
       // ▼ユーザーのポイントを更新する関数
       //----------------------------------------
       // 最初にリスナーを変数に格納
-      onSnapshot(user_q, (querySnapshot) => {
-        arrayUser.length = 0; // 配列をクリアして最新のデータを反映
+      // onSnapshot(user_q, (querySnapshot) => {
+      //   arrayUser.length = 0; // 配列をクリアして最新のデータを反映
 
-        querySnapshot.docs.forEach(function (doc) {
-          const document = {
-            id: doc.id,
-            data: doc.data(),
-          };
-          arrayUser.push(document);
-        });
+      //   querySnapshot.docs.forEach(function (doc) {
+      //     const document = {
+      //       id: doc.id,
+      //       data: doc.data(),
+      //     };
+      //     arrayUser.push(document);
+      //   });
 
-        // console.log("arrayUser", arrayUser)
-        // console.log("userHavePoint:", arrayUser[1].data.point);
+      //   // console.log("arrayUser", arrayUser)
+      //   // console.log("userHavePoint:", arrayUser[1].data.point);
 
-        const userPointElement = document.getElementById('userPoint');
-        if (userPointElement) {
-          userPointElement.textContent = arrayUser[0].data.point;
-        }
-      });
+      //   const userPointElement = document.getElementById('userPoint');
+      //   if (userPointElement) {
+      //     userPointElement.textContent = arrayUser[0].data.point;
+      //   }
+      // });
 
       // console.log("pointData", pointData);
       // console.log("countData", countData);
       // console.log(imageUrls);
 
-    });
+    // });
 
 
 
