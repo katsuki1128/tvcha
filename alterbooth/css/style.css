@@ -139,7 +139,7 @@ input {
 .clicked-image {
     animation-name: bounceAndExit;
     /* アニメーション名を指定 */
-    animation-duration: 1s;
+    animation-duration: 0.5s;
     /* アニメーションの時間を調整 */
     animation-timing-function: ease;
     /* タイミング関数を指定 */
