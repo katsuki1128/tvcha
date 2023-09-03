@@ -144,7 +144,10 @@
                     clickStamps.push(clickStamp);
                     // console.log("クリックされたスタンプ配列", clickStamps);
                     // console.log("クリックされたスタンプ", clickStamp);
-                    drawImageOnCanvas(); // 画像をCanvas上に描画
+                    // データを取得した後、2秒後にアニメーションを開始する
+                    // setTimeout(() => {
+                    drawImageOnCanvas();
+                    // }, 1000);
                 }
             });
 
@@ -178,6 +181,8 @@
             //----------------------------------------
             // ▼スタンプ描画関数
             //----------------------------------------
+
+
 
             // clickStampが更新されたら描画するための関数
             function drawImageOnCanvas() {
@@ -302,7 +307,7 @@
                             if (stamp.alpha <= 0 || stamp.size > 500) {
                                 stamp.alpha = -10; // 透明度が0のままキープする
                                 stamps.shift(); // 配列の先頭から削除
-                                console.log(stamp.size, stamp.alpha)
+                                // console.log(stamp.size, stamp.alpha)
                                 console.log("配列の先頭から削除しました", stamps);
                                 stamp.isAnimating = false;
 
@@ -317,8 +322,8 @@
 
                 };
                 image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLを格納
-                // console.log(image.src,);
-                // console.log(clickStamps.length - 1);
+                console.log(image.src,);
+                console.log(clickStamps.length - 1);
             };
         });
     </script>
