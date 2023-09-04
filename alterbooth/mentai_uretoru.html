@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>めんたいウレトルクイズ</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+</head>
+
+<body>
+    <!----------------------------------------------
+    ⭐️ポイント表示エリア  
+    ------------------------------------------------->
+
+    <section class="bg-gray-200">
+
+        <div class="flex flex-col items-center centered" style="z-index:2">
+            <h2 class="text-xl font-semibold mb-2">イベント熱量</h2>
+            <div id="userPoint" class="text-2xl font-bold userPoint"></div>
+        </div>
+
+    </section>
+
+    <!-- ⭐️スタンプ表示エリア -->
+    <div
+        style="position: relative; width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; background-color: white;">
+        <!-- <img src="img/geekersnight.png" -->
+        <!-- style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; z-index: 1;"> -->
+
+        <canvas id="overlay" style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
+    </div>
+
+    <script type="module">
+        //----------------------------------------
+        // ▼firebaseプロジェクトとjavaScriptを連携させる
+        //----------------------------------------
+
+        // 必要な機能をSDKからインポート
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+
+
+        // firebase firestoreとやり取りをする設定
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            serverTimestamp,
+            query,
+            orderBy, //データのソート
+            onSnapshot, // Firestore 上に保存されているデータを取得
+            doc,
+            deleteDoc,
+            updateDoc,
+            where,
+        } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+        // firebase storageとやり取りをする設定
+        import {
+            getStorage,
+            ref,
+            uploadBytes,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+
+
+
+        // ウェブアプリのFirebaseの設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyBs-rcINsUSZe7bD7OeLTrNcXm6-OInABg",
+            authDomain: "tvcha-9cae7.firebaseapp.com",
+            projectId: "tvcha-9cae7",
+            storageBucket: "tvcha-9cae7.appspot.com",
+            messagingSenderId: "866848033597",
+            appId: "1:866848033597:web:c6887382eb14ee58351354",
+        };
+
+        // Firebaseの初期化
+        const app = initializeApp(firebaseConfig);
+
+        // FirebaseアプリとCloud Storageの連携を初期化しセットアップする
+        const storage = getStorage(app);
+
+        // dbに対してデータの追加や取得ができるようにする
+        const db = getFirestore(app);
+
+        // コレクションの名前を定義
+        const collectionName = "alterbooth";
+        const collectionUsernName = "alter-user";
+
+        // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+        const q = query(collection(db, collectionName), orderBy("order", "desc"));
+
+        // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+        const user_q = query(collection(db, collectionUsernName));
+
+        //----------------------------------------
+        // クリックされたスタンプのURLを格納する配列
+        //----------------------------------------
+        let clickStamp = "";
+        const clickStamps = [];
+        const canvas = document.getElementById('overlay');
+        const ctx = canvas.getContext('2d');
+        const stamps = []; // スタンプの情報を保持する配列
+
+
+
+        //----------------------------------------
+        // ▼キャンバスサイズを設定
+        //----------------------------------------
+
+        // 初期サイズ設定
+        updateCanvasSize();
+
+        // ウィンドウのリサイズイベントを監視
+        window.addEventListener('resize', updateCanvasSize);
+
+        // キャンバスサイズをウィンドウの大きさに合わせて設定
+        function updateCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // console.log(canvas.width, canvas.height)
+            // キャンバスの再描画など追加の処理が必要な場合、ここで行うことができます。
+        };
+
+
+
+
+        //----------------------------------------
+        // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
+        //----------------------------------------
+
+
+        onSnapshot(q, (querySnapshot) => {
+
+            querySnapshot.docChanges().forEach((change) => {
+                if (change.type === "modified") {
+                    // console.log("クリックされました");
+                    const clickStamp = change.doc.data().img;
+                    clickStamps.push(clickStamp);
+                    // console.log("クリックされたスタンプ配列", clickStamps);
+                    // console.log("クリックされたスタンプ", clickStamp);
+                    // データを取得した後、2秒後にアニメーションを開始する
+                    // setTimeout(() => {
+                    drawImageOnCanvas();
+                    // }, 1000);
+                }
+            });
+
+            //----------------------------------------
+            // ▼ユーザーのポイントを更新する関数
+            //----------------------------------------
+            // 最初にリスナーを変数に格納
+            const arrayUser = []; // arrayUserを初期化しておく
+            onSnapshot(user_q, (querySnapshot) => {
+                arrayUser.length = 0; // 配列をクリアして最新のデータを反映
+
+                querySnapshot.docs.forEach(function (doc) {
+                    const document = {
+                        id: doc.id,
+                        data: doc.data(),
+                    };
+                    arrayUser.push(document);
+                });
+
+                const userPointElement = document.getElementById('userPoint');
+                if (userPointElement) {
+                    userPointElement.textContent = arrayUser[0].data.point;
+                    // console.log(userPointElement);
+                }
+
+            });
+
+            //----------------------------------------
+            // ▼スタンプ描画関数
+            //----------------------------------------
+
+            // clickStampが更新されたら描画するための関数
+            function drawImageOnCanvas() {
+
+                const image = document.createElement('img');
+                // console.log(image)
+                image.onload = function () {
+                    //----------------------------------------
+                    // ▼基本パラメータを設定
+                    //----------------------------------------
+
+                    let posX, posY, velocityX, velocityY;
+
+                    posX = Math.random() * canvas.width; // X座標をランダムに設定
+                    posY = 0; // 画面の上端に配置
+                    velocityX = 0; // X軸方向のランダムな速度
+                    velocityY = 2 + Math.random() * 3; // Y軸方向の速度
+                    // console.log(posX, posY, velocityX, velocityY);
+
+                    const targetX = (canvas.width) / 2// 画面中央のX座標
+                    const targetY = (canvas.height);
+
+                    let size = 100; // 初期サイズ
+                    // const maxSize = 500; // 最大サイズ
+
+                    const friction = 0; // 摩擦係数
+
+                    let alpha = 1.0; // 透明度
+                    let isAnimating = true; // アニメーション継続フラグ
+
+
+                    //----------------------------------------
+                    // ▼スタンプを配列に入れる
+                    //----------------------------------------
+
+                    const stampInfo = {
+                        image: image,
+                        posX: posX,
+                        posY: posY,
+                        velocityX: velocityX,
+                        velocityY: velocityY,
+                        size: size,
+                        alpha: alpha,
+                        isAnimating: isAnimating,
+                    };
+                    // console.log("stampInfo", stampInfo);
+                    stamps.push(stampInfo);
+
+                    // console.log("stamps", stamps);
+
+                    //----------------------------------------
+                    // ▼アニメーションの関数
+                    //----------------------------------------
+
+                    function animate() {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
+
+                        for (let i = 0; i < stamps.length; i++) {
+
+                            const stamp = stamps[i];
+
+                            // 位置を更新
+                            stamp.posX += stamp.velocityX;
+                            stamp.posY += stamp.velocityY;
+
+                            ctx.globalAlpha = stamp.alpha;
+
+                            // スタンプの中央座標を計算
+                            const centerX = stamp.posX + stamp.size / 2;
+                            const centerY = stamp.posY + stamp.size / 2;
+
+                            // スタンプの中央座標を中心に描画
+                            ctx.drawImage(stamp.image, centerX - stamp.size / 2, centerY - stamp.size / 2, stamp.size, stamp.size);
+
+                            if (stamp.posY > canvas.height) {
+                                stamps.shift(); // 配列の先頭から削除
+                                // console.log("配列の先頭から削除しました", stamps);
+                                stamp.isAnimating = false;
+                            };
+                            // console.log(stamp[1].velocityY);
+
+                        }
+                        if (stamps.length > 0) {
+                            requestAnimationFrame(animate);
+                        }
+                    };
+                    // アニメーションを開始
+                    animate();
+
+                };
+                image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLを格納
+                // console.log(image.src,);
+                // console.log(clickStamps.length - 1);
+            };
+        });
+    </script>
+</body>
+
+</html>
