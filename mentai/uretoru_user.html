@@ -105,13 +105,16 @@
     // コレクションの名前を定義
     const collectionName = "tvcha";
     const collectionUsernName = "tvcha-user";
+    const collectionJudgeName = "uretoru_judge";
 
     // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
     const q = query(collection(db, collectionName), orderBy("order", "desc"));
 
-    // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+    // 🔽 データ取得条件の指定
     const user_q = query(collection(db, collectionUsernName));
 
+    // 🔽 データ取得条件の指定
+    const judge_q = query(collection(db, collectionJudgeName));
 
     //----------------------------------------
     // ▼最初のスタンプ画像データの読み込み
@@ -202,6 +205,22 @@
       await updateDoc(doc(db, collectionName, stampId), {
         count: increment(1)
       });
+
+      const groupAIds = ["SI0RBSLBgTKJnzGfTZkd", "8fmPpQpokOkij2xLrLLh", "MawwOG0dGTLz3mMun66N", "MV1dCuItd07hHtW63R9b", "KMH49SypzltjQY1DKb1Q", "6Go7x57jHyY7y65qNlzD"];
+      const groupBIds = ["uDRAwqaBcBYUbHzkcNDx", "SUbqihCpuBG66tnWwYMA", "66itv5JXh76F8HkYeTNz", "d1DnJ9CFJizoPVQWtOpF", "liZQWmxw4Nx8hZU6SGkh"];
+
+      if (groupAIds.includes(stampId)) {
+        await updateDoc(doc(db, collectionJudgeName, "A_Group"), {
+          count: increment(1)
+        });
+      }
+
+      if (groupBIds.includes(stampId)) {
+        await updateDoc(doc(db, collectionJudgeName, "B_Group"), {
+          count: increment(1)
+        });
+      }
+
 
       // ドキュメントのpointを使用して更新
       await updateDoc(doc(db, collectionUsernName, userId), {

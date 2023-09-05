@@ -1,12 +1,6 @@
 body {
-    /* width: 500px; */
-    /* background-image: url("./img/living_bg.jpg"); */
     height: auto;
     background-repeat: no-repeat;
-    /* left: 0px; */
-    /* position: relative; */
-
-
     text-size-adjust: 100%;
     -webkit-text-size-adjust: 100%;
 }
@@ -308,4 +302,28 @@ iframe {
 .userPoint {
     display: inline-block;
     /* 要素を横並びに表示 */
+}
+
+/************************** 
+ウレトルクイズ スタンプ挙動
+***************************/
+
+.stampMoving {
+    animation: hirahira 8s linear;
+    display: inline-block;
+    height: 1em;
+    line-height: 1em;
+    position: fixed;
+    top: -1em;
+    z-index: 1000;
+}
+
+@keyframes hirahira {
+    0% {
+        transform: translateY(0) rotateY(0);
+    }
+
+    100% {
+        transform: translateY(calc(100vh + 1em)) rotateY(3600deg);
+    }
 }
