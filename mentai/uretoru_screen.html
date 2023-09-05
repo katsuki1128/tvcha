@@ -24,6 +24,14 @@
         <canvas id="overlay" style="position: absolute; top: 0; left: 0; z-index: 3;"></canvas>
     </div>
 
+    <!-- 左下のA_Groupのパーセンテージ表示 -->
+    <div id="AGroupPercentage" style="font-size: 120px; position: absolute; bottom: 0; left: 0;"></div>
+
+    <!-- 右側のB_Groupのパーセンテージ表示 -->
+    <div id="BGroupPercentage" style="font-size: 120px; position: absolute; bottom: 0; right: 0;"></div>
+
+    </div>
+
     <script type="module">
         //----------------------------------------
         // ▼firebaseプロジェクトとjavaScriptを連携させる
@@ -80,12 +88,16 @@
         // コレクションの名前を定義
         const collectionName = "tvcha";
         const collectionUsernName = "tvcha-user";
+        const collectionJudgeName = "uretoru_judge";
 
         // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
         const q = query(collection(db, collectionName), orderBy("order", "desc"));
 
-        // 🔽 データ取得条件の指定（今回はorder順に並び替えて取得）
+        // 🔽 データ取得条件の指定
         const user_q = query(collection(db, collectionUsernName));
+
+        // 🔽 データ取得条件の指定
+        const judge_q = query(collection(db, collectionJudgeName));
 
         //----------------------------------------
         // クリックされたスタンプのURLを格納する配列
@@ -159,13 +171,43 @@
 
             });
 
-            //----------------------------------------
-            // ▼スタンプ描画関数
-            //----------------------------------------
+        });
+        let AGroupCount;
+        let BGroupCount;
+        let AGroupPercentage = 0;
+        let BGroupPercentage = 0;
 
+        onSnapshot(judge_q, (querySnapshot) => {
+            querySnapshot.docs.forEach(function (doc) {
+                if (doc.id === "A_Group") {
+                    AGroupCount = doc.data().count;
+                } else if (doc.id === "B_Group") {
+                    BGroupCount = doc.data().count;
+                }
+            });
+            console.log("AGroupCount", AGroupCount, "BGroupCount", BGroupCount);
+            // パーセンテージの計算
+            const total = AGroupCount + BGroupCount;
+            AGroupPercentage = Math.round((AGroupCount / total) * 100); // 小数点を丸める
+            BGroupPercentage = 100 - AGroupPercentage;
 
+            // HTML要素にパーセンテージを表示
+            document.getElementById("AGroupPercentage").textContent = `${AGroupPercentage}%`;
+            document.getElementById("BGroupPercentage").textContent = `${BGroupPercentage}%`;
+
+            // 棒グラフの高さを動的に変更
+            // document.getElementById("AGroupBar").style.height = `${AGroupPercentage}%`;
+            // document.getElementById("BGroupBar").style.height = `${BGroupPercentage}%`;
+            // 棒グラフをCanvasに描画
+            // drawBarGraphOnCanvas(AGroupPercentage, BGroupPercentage);
+            drawBarGraph(AGroupPercentage, BGroupPercentage);
+            // console.log(AGroupPercentage, BGroupPercentage)
         });
 
+
+        //----------------------------------------
+        // ▼スタンプ描画関数
+        //----------------------------------------
         let isAnimationRunning = false;
 
         // clickStampが更新されたら描画するための関数
@@ -207,6 +249,9 @@
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
+            drawBarGraph(AGroupPercentage, BGroupPercentage); // ここでグラフを再描画
+            // console.log(AGroupPercentage, BGroupPercentage)
+            // console.log(AGroupPercentage, BGroupPercentage)
 
             for (let i = 0; i < stamps.length; i++) {
                 const stamp = stamps[i];
@@ -231,6 +276,30 @@
                 requestAnimationFrame(animate);
             }
         };
+        //----------------------------------------
+        // ▼棒グラフの描画関数
+        //----------------------------------------
+
+        function drawBarGraph(AGroupPercentage, BGroupPercentage) {
+            const barWidth = 200;
+            const barX1 = 0;
+            const barX2 = canvas.width - barWidth;
+
+            const maxCanvasPercentage = 0.5;  // これはcanvas.heightの50%を意味します。
+
+            const AGroupHeight = calculateBarHeight(AGroupPercentage, maxCanvasPercentage, canvas.height);
+            const BGroupHeight = calculateBarHeight(BGroupPercentage, maxCanvasPercentage, canvas.height);
+
+            ctx.fillStyle = 'red'; // A_Group の色
+            ctx.fillRect(barX1, canvas.height, barWidth, -AGroupHeight);
+
+            ctx.fillStyle = 'blue'; // B_Group の色
+            ctx.fillRect(barX2, canvas.height, barWidth, -BGroupHeight);
+        };
+
+        function calculateBarHeight(percentage, maxCanvasPercentage, canvasHeight) {
+            return (percentage / 100) * maxCanvasPercentage * canvasHeight;
+        }
 
     </script>
 </body>

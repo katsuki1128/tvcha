@@ -327,3 +327,31 @@ iframe {
         transform: translateY(calc(100vh + 1em)) rotateY(3600deg);
     }
 }
+
+.bar-container {
+    display: flex;
+    height: 300px;
+    /* グラフの最大高さを設定（調整可能） */
+    align-items: flex-end;
+    /* 棒グラフの下から開始 */
+}
+
+.bar {
+    width: 50%;
+    /* 2つの棒グラフなので、50%ずつの幅 */
+    background-color: #3498db;
+    /* 棒グラフの色（調整可能） */
+    transition: height 0.5s;
+    /* アニメーションの効果 */
+}
+
+/* Bグループの棒グラフの色を変えたい場合 */
+#BGroupBar {
+    background-color: #e74c3c;
+    /* 色を変更（調整可能） */
+}
+
+#AGroupPercentage,
+#BGroupPercentage {
+    z-index: 4;
+}
