@@ -174,8 +174,8 @@
         });
         let AGroupCount;
         let BGroupCount;
-        let AGroupPercentage = 0;
-        let BGroupPercentage = 0;
+        let AGroupPercentage;
+        let BGroupPercentage;
 
         onSnapshot(judge_q, (querySnapshot) => {
             querySnapshot.docs.forEach(function (doc) {
@@ -201,7 +201,8 @@
             // 棒グラフをCanvasに描画
             // drawBarGraphOnCanvas(AGroupPercentage, BGroupPercentage);
             drawBarGraph(AGroupPercentage, BGroupPercentage);
-            // console.log(AGroupPercentage, BGroupPercentage)
+
+            console.log(AGroupPercentage, BGroupPercentage)
         });
 
 
@@ -280,6 +281,10 @@
         // ▼棒グラフの描画関数
         //----------------------------------------
 
+        let currentAGroupHeight = 0;
+        let currentBGroupHeight = 0;
+        const lerpRate = 0.05;  // 補完率。0.05のような小さい値でスムーズな変化を得る
+
         function drawBarGraph(AGroupPercentage, BGroupPercentage) {
             const barWidth = 200;
             const barX1 = 0;
@@ -287,19 +292,27 @@
 
             const maxCanvasPercentage = 0.5;  // これはcanvas.heightの50%を意味します。
 
-            const AGroupHeight = calculateBarHeight(AGroupPercentage, maxCanvasPercentage, canvas.height);
-            const BGroupHeight = calculateBarHeight(BGroupPercentage, maxCanvasPercentage, canvas.height);
+            // const AGroupHeight = calculateBarHeight(AGroupPercentage, maxCanvasPercentage, canvas.height);
+            // const BGroupHeight = calculateBarHeight(BGroupPercentage, maxCanvasPercentage, canvas.height);
+            const targetAGroupHeight = calculateBarHeight(AGroupPercentage, maxCanvasPercentage, canvas.height);
+            const targetBGroupHeight = calculateBarHeight(BGroupPercentage, maxCanvasPercentage, canvas.height);
 
-            ctx.fillStyle = 'red'; // A_Group の色
-            ctx.fillRect(barX1, canvas.height, barWidth, -AGroupHeight);
+            // 現在の高さを目標の高さに近づける
+            currentAGroupHeight += (targetAGroupHeight - currentAGroupHeight) * lerpRate;
+            currentBGroupHeight += (targetBGroupHeight - currentBGroupHeight) * lerpRate;
 
-            ctx.fillStyle = 'blue'; // B_Group の色
-            ctx.fillRect(barX2, canvas.height, barWidth, -BGroupHeight);
+            ctx.fillStyle = 'red';
+            ctx.fillRect(barX1, canvas.height, barWidth, -currentAGroupHeight);
+            console.log(canvas.height);
+
+            ctx.fillStyle = 'blue';
+            ctx.fillRect(barX2, canvas.height, barWidth, -currentBGroupHeight);
         };
 
         function calculateBarHeight(percentage, maxCanvasPercentage, canvasHeight) {
             return (percentage / 100) * maxCanvasPercentage * canvasHeight;
         }
+
 
     </script>
 </body>
