@@ -181,7 +181,8 @@
         //----------------------------------------
         // ▼基本パラメータを設定
         //----------------------------------------
-        const targetX = (canvas.width) / 2// 画面中央のX座標
+        // const targetX = (canvas.width) / 2// 画面中央のX座標
+        const targetX = Math.random() * canvas.width;
         // const variance = canvas.width / 40;  // これはどれくらい変動するかの範囲を指定します。この場合、画面の1/4の範囲で変動します。
         // const targetX = canvas.width / 2 + (Math.random() - 0.5) * 2 * canvas.width / 40;  // 画面中央のX座標を基点にランダムな値を加える
 
@@ -212,14 +213,29 @@
 
                 if (Math.random() < 0.5) {
                     posX = 0;
-                    velocityX = 45;
+                    // velocityX = 10;
+
+                    const velocities = [10, 20, 40, 60, 0];
+                    const randomIndex = Math.floor(Math.random() * velocities.length);
+                    velocityX = velocities[randomIndex];
+
+
                     posY = Math.random() * canvas.height / 4 * 3;
                 }
                 else {
                     posX = canvas.width;
-                    velocityX = -45
+                    // ランダムな速度を設定
+
+                    const velocities = [-30, -50, -70, -90, -110];
+                    const randomIndex = Math.floor(Math.random() * velocities.length);
+                    velocityX = velocities[randomIndex];
+                    // velocityX = -45;
+
+
                     posY = Math.random() * canvas.height / 4 * 3;
                 }
+
+                console.log(velocityX)
                 const stampInfo = {
                     image: image,
                     posX: posX,
@@ -258,7 +274,7 @@
                 if (stamp.isAnimating) {
                     stamp.velocityX *= friction; // 摩擦を適用
                     stamp.velocityY *= friction; // 摩擦を適用
-                    console.log("読み込み")
+                    // console.log("読み込み")
                     // 位置を更新
                     stamp.posX += stamp.velocityX; // 速度による位置の変化
                     stamp.posY += stamp.velocityY; // 速度による位置の変化
