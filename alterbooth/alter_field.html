@@ -112,6 +112,7 @@
         const clickStamps = [];
         const canvas = document.getElementById('overlay');
         const ctx = canvas.getContext('2d');
+        const stamps = []; // スタンプの情報を保持する配列
 
 
         //----------------------------------------
@@ -132,8 +133,6 @@
             // キャンバスの再描画など追加の処理が必要な場合、ここで行うことができます。
         };
 
-        const stamps = []; // スタンプの情報を保持する配列
-
         // データ取得処理(データベース上でデータの変更が発生したタイミングで {} 内の処理を実行)
         onSnapshot(q, (querySnapshot) => {
 
@@ -141,191 +140,160 @@
                 if (change.type === "modified") {
                     // console.log("クリックされました");
                     const clickStamp = change.doc.data().img;
-                    clickStamps.push(clickStamp);
+                    // clickStamps.push(clickStamp);
                     // console.log("クリックされたスタンプ配列", clickStamps);
                     // console.log("クリックされたスタンプ", clickStamp);
                     // データを取得した後、2秒後にアニメーションを開始する
                     // setTimeout(() => {
-                    drawImageOnCanvas();
+                    drawImageOnCanvas(clickStamp);
+                    // console.log(clickStamp);
                     // }, 1000);
                 }
             });
+        });
 
-            //----------------------------------------
-            // ▼ユーザーのポイントを更新する関数
-            //----------------------------------------
-            // 最初にリスナーを変数に格納
-            const arrayUser = []; // arrayUserを初期化しておく
-            onSnapshot(user_q, (querySnapshot) => {
-                arrayUser.length = 0; // 配列をクリアして最新のデータを反映
+        //----------------------------------------
+        // ▼ユーザーのポイントを更新する関数
+        //----------------------------------------
+        // 最初にリスナーを変数に格納
+        const arrayUser = []; // arrayUserを初期化しておく
+        onSnapshot(user_q, (querySnapshot) => {
+            arrayUser.length = 0; // 配列をクリアして最新のデータを反映
 
-                querySnapshot.docs.forEach(function (doc) {
-                    const document = {
-                        id: doc.id,
-                        data: doc.data(),
-                    };
-                    arrayUser.push(document);
-                });
-
-                // console.log("arrayUser", arrayUser)
-                // console.log("userHavePoint:", arrayUser[1].data.point);
-
-                const userPointElement = document.getElementById('userPoint');
-                if (userPointElement) {
-                    userPointElement.textContent = arrayUser[0].data.point;
-                    // console.log(userPointElement);
-                }
-
+            querySnapshot.docs.forEach(function (doc) {
+                const document = {
+                    id: doc.id,
+                    data: doc.data(),
+                };
+                arrayUser.push(document);
             });
 
-            //----------------------------------------
-            // ▼スタンプ描画関数
-            //----------------------------------------
+            // console.log("arrayUser", arrayUser)
+            // console.log("userHavePoint:", arrayUser[1].data.point);
 
-
-
-            // clickStampが更新されたら描画するための関数
-            function drawImageOnCanvas() {
-
-                const image = document.createElement('img');
-                // console.log(image)
-                image.onload = function () {
-                    //----------------------------------------
-                    // ▼基本パラメータを設定
-                    //----------------------------------------
-                    const targetX = (canvas.width) / 2// 画面中央のX座標
-                    const targetY = (canvas.height) / 2; // 画面中央のY座標
-
-                    // console.log(targetX, targetY);
-
-
-                    // // ランダムなX座標を計算（画面左端から画面右端までのランダムな値）
-                    // const randomX = Math.random() * canvas.width;
-
-                    // // ランダムなY座標を計算（画面上端から画面下端までのランダムな値）
-                    // const randomY = Math.random() * canvas.height;
-
-                    // // posX と posY を計算したランダムな座標に設定
-                    // let posX = randomX;
-                    // let posY = randomY;
-
-                    // let posX = 0; // 初期位置をCanvasの左端に設定
-                    // let posY = canvas.height / 3 * 1; // 初期位置をCanvasの中央に設定
-
-                    let posX, posY, velocityX, velocityY;
-
-
-                    if (Math.random() < 0.5) {
-                        posX = 0;
-                        velocityX = 45
-                        posY = Math.random() * canvas.height;
-                    }
-                    else {
-                        posX = canvas.width;
-                        velocityX = -45
-                        posY = Math.random() * canvas.height;
-                    }
-                    // posX = Math.random() < 0.5 ? 0 : canvas.width;
-                    // posY = Math.random() * canvas.height;
-
-                    // let velocityX = 45; // X軸方向の速度
-                    velocityY = 0; // Y軸方向の速度
-
-                    // let velocityX = 45; // X軸方向の速度
-                    // let velocityY = 0; // Y軸方向の速度
-
-                    let size = 0; // 初期サイズ
-                    const maxSize = 500; // 最大サイズ
-                    // const growthRate = 2; // サイズの成長率
-                    const friction = 0.95; // 摩擦係数
-
-                    let alpha = 1.0; // 透明度
-                    let isAnimating = true; // アニメーション継続フラグ
-
-                    const initialGrowthRate = 2; // 初期の成長率
-
-                    //----------------------------------------
-                    // ▼スタンプを配列に入れる
-                    //----------------------------------------
-
-                    const stampInfo = {
-                        image: image,
-                        posX: posX,
-                        posY: posY,
-                        velocityX: velocityX,
-                        velocityY: velocityY,
-                        size: size,
-                        alpha: alpha,
-                        isAnimating: isAnimating,
-                    };
-                    // console.log("stampInfo", stampInfo);
-                    stamps.push(stampInfo);
-
-                    // console.log("stamps", stamps);
-
-                    //----------------------------------------
-                    // ▼アニメーションの関数
-                    //----------------------------------------
-
-                    function animate() {
-                        ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
-
-                        // 速度を更新
-                        for (let i = 0; i < stamps.length; i++) {
-
-                            const stamp = stamps[i];
-
-                            stamp.velocityX *= friction; // 摩擦を適用
-                            stamp.velocityY *= friction; // 摩擦を適用
-
-                            // 位置を更新
-                            stamp.posX += stamp.velocityX; // 速度による位置の変化
-                            stamp.posY += stamp.velocityY; // 速度による位置の変化
-
-                            // サイズを更新
-                            const distanceToTarget = Math.sqrt((targetX - stamp.posX) ** 2 + (targetY - stamp.posY) ** 2);
-                            const growthRate = initialGrowthRate * (1 + distanceToTarget / canvas.width); // 距離に応じて成長率を調整
-
-
-                            // サイズを更新
-                            if (stamp.size < 450) {
-                                stamp.size += growthRate; // 成長率によるサイズの増加
-                            } else if (stamp.size >= 450 && stamp.size < maxSize) {
-                                stamp.size += growthRate; // 400から500の間も成長を続ける
-                                stamp.alpha -= 0.05; // 透明度を下げる
-                            }
-
-                            ctx.globalAlpha = stamp.alpha;
-
-                            // スタンプの中央座標を計算
-                            const centerX = stamp.posX + stamp.size / 2;
-                            const centerY = stamp.posY + stamp.size / 2;
-
-                            // スタンプの中央座標を中心に描画
-                            ctx.drawImage(stamp.image, centerX - stamp.size / 2, centerY - stamp.size / 2, stamp.size, stamp.size);
-
-                            if (stamp.alpha <= 0 || stamp.size > 500) {
-                                stamp.alpha = -10; // 透明度が0のままキープする
-                                stamps.shift(); // 配列の先頭から削除
-                                // console.log(stamp.size, stamp.alpha)
-                                console.log("配列の先頭から削除しました", stamps);
-                                stamp.isAnimating = false;
-
-                            }
-                        }
-                        if (stamps.length > 0) {
-                            requestAnimationFrame(animate);
-                        }
-                    };
-                    // アニメーションを開始
-                    animate();
-
-                };
-                image.src = clickStamps[clickStamps.length - 1]; // clickStampsに画像のURLを格納
-                console.log(image.src,);
-                console.log(clickStamps.length - 1);
-            };
+            const userPointElement = document.getElementById('userPoint');
+            if (userPointElement) {
+                userPointElement.textContent = arrayUser[0].data.point;
+                // console.log(userPointElement);
+            }
         });
+
+        //----------------------------------------
+        // ▼基本パラメータを設定
+        //----------------------------------------
+        const targetX = (canvas.width) / 2// 画面中央のX座標
+        const targetY = (canvas.height) / 2; // 画面中央のY座標
+        const maxSize = 500; // 最大サイズ
+        let friction = 0.95; // 摩擦係数
+        const initialGrowthRate = 2; // 初期の成長率
+
+        //----------------------------------------
+        // ▼摩擦係数
+        //----------------------------------------
+
+        //----------------------------------------
+        // ▼スタンプ描画関数
+        //----------------------------------------
+        let isAnimationRunning = false;
+
+        // clickStampが更新されたら描画するための関数
+        function drawImageOnCanvas(stampURL) {
+
+            const image = document.createElement('img');
+            image.onload = function () {
+                //----------------------------------------
+                // ▼スタンプを配列に入れる
+                //----------------------------------------
+
+                let posX, posY, velocityX;
+
+                if (Math.random() < 0.5) {
+                    posX = 0;
+                    velocityX = 45
+                    posY = Math.random() * canvas.height / 4 * 3;
+                }
+                else {
+                    posX = canvas.width;
+                    velocityX = -45
+                    posY = Math.random() * canvas.height / 4 * 3;
+                }
+                const stampInfo = {
+                    image: image,
+                    posX: posX,
+                    posY: posY,
+                    velocityX: velocityX,
+                    velocityY: 0,
+                    size: 0,
+                    alpha: 1.0,
+                    isAnimating: true,
+                };
+                stamps.push(stampInfo);
+                // console.log(stamps)
+
+                // アニメーションを開始
+                if (!isAnimationRunning) {
+                    isAnimationRunning = true;
+                    animate();
+                }
+            };
+            image.src = stampURL; // clickStampsに画像のURLを格納
+        };
+        //----------------------------------------
+        // ▼アニメーションの関数
+        //----------------------------------------
+
+        // アニメーションを開始
+        // animate();
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Canvasをクリア
+
+            // 速度を更新
+            for (let i = 0; i < stamps.length; i++) {
+                const stamp = stamps[i];
+
+                if (stamp.isAnimating) {
+                    stamp.velocityX *= friction; // 摩擦を適用
+                    stamp.velocityY *= friction; // 摩擦を適用
+                    console.log("読み込み")
+                    // 位置を更新
+                    stamp.posX += stamp.velocityX; // 速度による位置の変化
+                    stamp.posY += stamp.velocityY; // 速度による位置の変化
+
+                    // サイズを更新
+                    const distanceToTarget = Math.sqrt((targetX - stamp.posX) ** 2 + (targetY - stamp.posY) ** 2);
+                    const growthRate = initialGrowthRate * (1 + distanceToTarget / canvas.width); // 距離に応じて成長率を調整
+
+                    // サイズを更新
+                    if (stamp.size < 450) {
+                        stamp.size += growthRate; // 成長率によるサイズの増加
+                    } else if (stamp.size >= 450 && stamp.size < maxSize) {
+                        stamp.size += growthRate; // 400から500の間も成長を続ける
+                        stamp.alpha -= 0.05; // 透明度を下げる
+                    }
+
+                    ctx.globalAlpha = stamp.alpha;
+
+                    // スタンプの中央座標を計算
+                    const centerX = stamp.posX + stamp.size / 2;
+                    const centerY = stamp.posY + stamp.size / 2;
+
+                    // スタンプの中央座標を中心に描画
+                    ctx.drawImage(stamp.image, centerX - stamp.size / 2, centerY - stamp.size / 2, stamp.size, stamp.size);
+
+                    if (stamp.alpha <= 0 || stamp.size > 500) {
+                        stamp.alpha = -10; // 透明度が-10のままキープする
+                        // stamps.shift(); // 配列の先頭から削除
+                        // console.log(stamp.size, stamp.alpha)
+                        // console.log("配列の先頭から削除しました", stamps);
+                        stamp.isAnimating = false;
+                    };
+                };
+            }
+            if (stamps.length > 0) {
+                requestAnimationFrame(animate);
+            }
+        };
     </script>
 </body>
 
