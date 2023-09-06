@@ -182,6 +182,9 @@
         // ▼基本パラメータを設定
         //----------------------------------------
         const targetX = (canvas.width) / 2// 画面中央のX座標
+        // const variance = canvas.width / 40;  // これはどれくらい変動するかの範囲を指定します。この場合、画面の1/4の範囲で変動します。
+        // const targetX = canvas.width / 2 + (Math.random() - 0.5) * 2 * canvas.width / 40;  // 画面中央のX座標を基点にランダムな値を加える
+
         const targetY = (canvas.height) / 2; // 画面中央のY座標
         const maxSize = 500; // 最大サイズ
         let friction = 0.95; // 摩擦係数
@@ -209,7 +212,7 @@
 
                 if (Math.random() < 0.5) {
                     posX = 0;
-                    velocityX = 45
+                    velocityX = 45;
                     posY = Math.random() * canvas.height / 4 * 3;
                 }
                 else {
@@ -271,7 +274,6 @@
                         stamp.size += growthRate; // 400から500の間も成長を続ける
                         stamp.alpha -= 0.05; // 透明度を下げる
                     }
-
                     ctx.globalAlpha = stamp.alpha;
 
                     // スタンプの中央座標を計算
@@ -282,10 +284,11 @@
                     ctx.drawImage(stamp.image, centerX - stamp.size / 2, centerY - stamp.size / 2, stamp.size, stamp.size);
 
                     if (stamp.alpha <= 0 || stamp.size > 500) {
-                        stamp.alpha = -10; // 透明度が-10のままキープする
+                        stamp.alpha = 0; // 透明度が-10のままキープする
                         // stamps.shift(); // 配列の先頭から削除
                         // console.log(stamp.size, stamp.alpha)
                         // console.log("配列の先頭から削除しました", stamps);
+
                         stamp.isAnimating = false;
                     };
                 };
